@@ -26,8 +26,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "gpu\libs\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj", "{644D1546-4849-45EB-8B45-DAE8333A5654}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.TestApp", "Examples\gpu\UltralightNet.Veldrid.TestApp\UltralightNet.Veldrid.TestApp.csproj", "{F6F0F247-9E1D-469C-81D1-4FAAD701933C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.SDL2", "src\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj", "{D2C07055-8EBB-4327-995E-612B566E4B8E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.GPUCommon", "gpu\libs\UltralightNet.GPUCommon\UltralightNet.GPUCommon.csproj", "{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}"
@@ -58,10 +56,6 @@ Global
 		{644D1546-4849-45EB-8B45-DAE8333A5654}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{644D1546-4849-45EB-8B45-DAE8333A5654}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{644D1546-4849-45EB-8B45-DAE8333A5654}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6F0F247-9E1D-469C-81D1-4FAAD701933C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6F0F247-9E1D-469C-81D1-4FAAD701933C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6F0F247-9E1D-469C-81D1-4FAAD701933C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6F0F247-9E1D-469C-81D1-4FAAD701933C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -5,7 +5,7 @@ namespace UltralightNet.Veldrid.SDL2;
 
 public static class KeyConverter
 {
-	public static UlKeyEvent ToULKeyEvent(in this KeyEvent k)
+	public static UlKeyEvent ToUlKeyEvent(in this KeyEvent k)
 	{
 		var type = k.Down ? KeyEventType.RawKeyDown : KeyEventType.KeyUp;
 		KeyEventModifiers modifiers = 0;
@@ -27,7 +27,7 @@ public static class KeyConverter
 			}*/
 			keycode = 13;
 		else
-			keycode = SDLtoUL(key);
+			keycode = SdLtoUl(key);
 
 		if (k.Down && false)
 			if (key > (Key)82 && key < (Key)119)
@@ -44,7 +44,7 @@ public static class KeyConverter
 		return UlKeyEvent.Create(type, modifiers, keycode, 0, text, text, false, k.Repeat, false);
 	}
 
-	public static int SDLtoUL(Key key)
+	public static int SdLtoUl(Key key)
 	{
 		#region 0 - 9
 
