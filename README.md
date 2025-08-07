@@ -8,14 +8,11 @@ and [Ultralight's documentation](https://docs.ultralig.ht/docs).
 
 ## Supported Frameworks
 
-* .NET >= `6.0`
-* .NET Framework >= `4.6.1` (using `netstandard2.0`, untested)
-* .NET Standard >= `2.0` ([Unity is untested](https://github.com/SupinePandora43/UltralightNet/projects/3))
+* .NET >= `8.0`
 
 ## Reporting issues
 
-* [issues page on github](https://github.com/SupinePandora43/UltralightNet/issues)
-* Discord `@SupinePandora`
+* [issues page on github](https://github.com/DawnestOfBread/UltralightNet/issues)
 
 ## License
 
