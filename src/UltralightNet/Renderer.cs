@@ -1,17 +1,18 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using UltralightNet.Gamepad;
-using UltralightNet.LowStuff;
 using UltralightNet.Platform;
+using UltralightNet.Structs;
 
 namespace UltralightNet;
 
-public static unsafe partial class Methods
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal static unsafe partial class Methods
 {
 	[LibraryImport(LibUltralight)]
-	internal static partial void* ulCreateRenderer(in ULConfig config);
+	internal static partial void* ulCreateRenderer(in UlConfig config);
 
 	/// <summary>Destroy the renderer.</summary>
 	[LibraryImport(LibUltralight)]
@@ -37,7 +38,8 @@ public static unsafe partial class Methods
 	internal static partial bool ulStartRemoteInspectorServer(Renderer renderer, string address, ushort port);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulSetGamepadDetails(Renderer renderer, uint index, [MarshalUsing(typeof(ULString))] string id, uint axisCount, uint buttonCount);
+	internal static partial void ulSetGamepadDetails(Renderer renderer, uint index,
+		[MarshalUsing(typeof(UlString))] string id, uint axisCount, uint buttonCount);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulFireGamepadEvent(Renderer renderer, GamepadEvent* gamepadEvent);
@@ -52,6 +54,17 @@ public static unsafe partial class Methods
 [NativeMarshalling(typeof(Marshaller))]
 public sealed unsafe class Renderer : NativeContainer
 {
+	internal static readonly Dictionary<nuint, WeakReference<Renderer>> Renderers = new(1);
+	internal IClipboard.Wrapper? ClipboardWrapper;
+	internal IFileSystem.Wrapper? FilesystemWrapper;
+	internal IFontLoader.Wrapper? FontLoaderWrapper;
+	internal IGpuDriver.Wrapper? GpuDriverWrapper;
+
+	// Soul keepers
+	internal ILogger.Wrapper? LoggerWrapper;
+	internal ISurfaceDefinition.Wrapper? SurfaceDefinitionWrapper;
+	internal readonly Dictionary<nuint, WeakReference<View>> Views = new(1);
+
 	protected override void* Handle
 	{
 		get
@@ -61,84 +74,143 @@ public sealed unsafe class Renderer : NativeContainer
 		}
 		init
 		{
-			renderers[(nuint)value] = new WeakReference<Renderer>(this);
+			Renderers[(nuint)value] = new WeakReference<Renderer>(this);
 			base.Handle = value;
 		}
 	}
 
 	internal int ThreadId { get; set; } = -1;
+
+	public Session DefaultSession => Session.FromHandle(Methods.ulDefaultSession(this), false);
+
 	internal void AssertNotWrongThread() // hungry
 	{
-		if (ThreadId is not -1 or int.MaxValue && ULPlatform.ErrorWrongThread && ThreadId != Environment.CurrentManagedThreadId) throw new AggregateException("Wrong thread. (ULPlatform.ErrorWrongThread)");
+		if (ThreadId is not -1 && UlPlatform.ErrorWrongThread &&
+		    ThreadId != Environment.CurrentManagedThreadId)
+			throw new AggregateException("Wrong thread. (UlPlatform.ErrorWrongThread)");
 	}
 
-	public View CreateView(uint width, uint height, ULViewConfig? viewConfig = null, Session? session = null, bool dispose = true)
+	public View CreateView(uint width, uint height, UlViewConfig? viewConfig = null, Session? session = null,
+		bool dispose = true)
 	{
-		viewConfig ??= new();
-		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.Value.IsAccelerated && (gpuDriverWrapper?.IsDisposed).GetValueOrDefault(true))
-		{
-			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated was set to true. (Disable check by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
-		}
-		var view = View.FromHandle(Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
+		viewConfig ??= new UlViewConfig();
+		if (Owns && UlPlatform.ErrorGPUDriverNotSet && viewConfig.Value.IsAccelerated &&
+		    (GpuDriverWrapper?.IsDisposed).GetValueOrDefault(true))
+			throw new Exception(
+				"No UlPlatform.GPUDriver set, but UlViewConfig.IsAccelerated was set to true. (Disable check by setting UlPlatform.ErrorGPUDriverNotSet to false.)");
+		var view = View.FromHandle(
+			Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
 		view.Renderer = this;
-		views[view.GetUserData()] = new WeakReference<View>(view);
+		Views[view.GetUserData()] = new WeakReference<View>(view);
 		view.SetUpCallbacks();
 		return view;
 	}
+
 	/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
-	/// <remarks>A default, persistent Session is already created for you. You only need to call this if you want to create private, in-memory session or use a separate session for each View.</remarks>
-	/// <param name="is_persistent">Whether or not to store the session on disk.<br/>Persistent sessions will be written to the path set in <see cref="ULConfig.CachePath"/></param>
-	/// <param name="name">A unique name for this session, this will be used to generate a unique disk path for persistent sessions.</param>
-	public Session CreateSession(bool isPersistent, string name) => Session.FromHandle(Methods.ulCreateSession(this, isPersistent, name), true);
-	public Session DefaultSession => Session.FromHandle(Methods.ulDefaultSession(this), false);
+	/// <remarks>
+	///     A default, persistent Session is already created for you. You only need to call this if you want to create
+	///     private, in-memory session or use a separate session for each View.
+	/// </remarks>
+	/// <param name="isPersistent">
+	///     Whether to store the session on disk.<br />Persistent sessions will be written to
+	///     the path set in <see cref="UlConfig.CachePath" />
+	/// </param>
+	/// <param name="name">
+	///     A unique name for this session, this will be used to generate a unique disk path for persistent
+	///     sessions.
+	/// </param>
+	public Session CreateSession(bool isPersistent, string name)
+	{
+		return Session.FromHandle(Methods.ulCreateSession(this, isPersistent, name), true);
+	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Update() => Methods.ulUpdate(this);
+	public void Update()
+	{
+		Methods.ulUpdate(this);
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Render() => Methods.ulRender(this);
-	public void PurgeMemory() => Methods.ulPurgeMemory(this);
-	public void LogMemoryUsage() => Methods.ulLogMemoryUsage(this);
+	public void Render()
+	{
+		Methods.ulRender(this);
+	}
 
-	public bool TryStartRemoteInspectorServer(string address, ushort port) => Methods.ulStartRemoteInspectorServer(this, address, port);
+	public void PurgeMemory()
+	{
+		Methods.ulPurgeMemory(this);
+	}
 
-	public void SetGamepadDetails(uint index, string id, uint axisCount, uint buttonCount) => Methods.ulSetGamepadDetails(this, index, id, axisCount, buttonCount);
-	public void FireGamepadEvent(GamepadEvent gamepadEvent) => Methods.ulFireGamepadEvent(this, &gamepadEvent);
-	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => Methods.ulFireGamepadAxisEvent(this, &gamepadAxisEvent);
-	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => Methods.ulFireGamepadButtonEvent(this, &gamepadbuttonEvent);
+	public void LogMemoryUsage()
+	{
+		Methods.ulLogMemoryUsage(this);
+	}
+
+	public bool TryStartRemoteInspectorServer(string address, ushort port)
+	{
+		return Methods.ulStartRemoteInspectorServer(this, address, port);
+	}
+
+	public void SetGamepadDetails(uint index, string id, uint axisCount, uint buttonCount)
+	{
+		Methods.ulSetGamepadDetails(this, index, id, axisCount, buttonCount);
+	}
+
+	public void FireGamepadEvent(GamepadEvent gamepadEvent)
+	{
+		Methods.ulFireGamepadEvent(this, &gamepadEvent);
+	}
+
+	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent)
+	{
+		Methods.ulFireGamepadAxisEvent(this, &gamepadAxisEvent);
+	}
+
+	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent)
+	{
+		Methods.ulFireGamepadButtonEvent(this, &gamepadbuttonEvent);
+	}
 
 	public override void Dispose()
 	{
 		if (!IsDisposed && Owns) Methods.ulDestroyRenderer(this);
-		GC.KeepAlive(loggerWrapper);
-		GC.KeepAlive(filesystemWrapper);
-		GC.KeepAlive(fontloaderWrapper);
-		GC.KeepAlive(gpuDriverWrapper);
-		GC.KeepAlive(surfaceDefinitionWrapper);
-		GC.KeepAlive(clipboardWrapper);
+		GC.KeepAlive(LoggerWrapper);
+		GC.KeepAlive(FilesystemWrapper);
+		GC.KeepAlive(FontLoaderWrapper);
+		GC.KeepAlive(GpuDriverWrapper);
+		GC.KeepAlive(SurfaceDefinitionWrapper);
+		GC.KeepAlive(ClipboardWrapper);
 		base.Dispose();
 	}
 
-	internal static Dictionary<nuint, WeakReference<Renderer>> renderers = new(1);
-	internal Dictionary<nuint, WeakReference<View>> views = new(1);
+	internal static Renderer FromHandle(void* handle, bool dispose)
+	{
+		return new Renderer { Handle = handle, Owns = dispose };
+	}
 
-	// Soul keepers
-	internal ILogger.Wrapper? loggerWrapper;
-	internal IFileSystem.Wrapper? filesystemWrapper;
-	internal IFontLoader.Wrapper? fontloaderWrapper;
-	internal IGPUDriver.Wrapper? gpuDriverWrapper;
-	internal ISurfaceDefinition.Wrapper? surfaceDefinitionWrapper;
-	internal IClipboard.Wrapper? clipboardWrapper;
-
-	internal static Renderer FromHandle(void* handle, bool dispose) => new() { Handle = handle, Owns = dispose };
-	internal nuint GetCallbackData() => (nuint)Handle;
+	internal nuint GetCallbackData()
+	{
+		return (nuint)Handle;
+	}
 
 	[CustomMarshaller(typeof(Renderer), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller
 	{
-		private Renderer renderer;
+		private Renderer _renderer;
 
-		public void FromManaged(Renderer renderer) => this.renderer = renderer;
-		public readonly void* ToUnmanaged() => renderer.Handle;
-		public readonly void Free() => GC.KeepAlive(renderer);
+		public void FromManaged(Renderer renderer)
+		{
+			_renderer = renderer;
+		}
+
+		public readonly void* ToUnmanaged()
+		{
+			return _renderer.Handle;
+		}
+
+		public readonly void Free()
+		{
+			GC.KeepAlive(_renderer);
+		}
 	}
 }

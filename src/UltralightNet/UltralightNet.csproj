@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+		<PackageId>DawnestOfBread.UltralightNet</PackageId>
+		<TargetFrameworks>net8.0;</TargetFrameworks>
 		<UseAppHost>true</UseAppHost>
 		<IsPackable>true</IsPackable>
 
@@ -12,26 +13,43 @@
 		<!-- CA1816 creates noise in some Dispose() methods of Wrapper classes -->
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="resources\cacert.pem" />
-	  <None Remove="resources\icudt67l.dat" />
+		<None Remove="resources\cacert.pem"/>
+		<None Remove="resources\icudt67l.dat"/>
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="resources\cacert.pem" />
-	  <EmbeddedResource Include="resources\icudt67l.dat" />
+		<EmbeddedResource Include="resources\cacert.pem"/>
+		<EmbeddedResource Include="resources\icudt67l.dat"/>
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net8.0'" />
+		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net8.0'"/>
 	</ItemGroup>
 	<ItemGroup>
 		<!-- <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
 		<!-- <PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
 
-		<!-- <PackageReference Include="Microsoft.Interop.LibraryImportGenerator" Version="7.0.8.32201" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
+		<!--		 <PackageReference Include="Microsoft.Interop.LibraryImportGenerator" Version="7.0.8.32201" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
 
-		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Memory" Version="4.5.4" />
-		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Numerics.Vectors" Version="4.5.0" />
-		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Memory" Version="4.5.4"/>
+		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Numerics.Vectors" Version="4.5.0"/>
+		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0"/>
 
-		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)"/>
 	</ItemGroup>
+
+	<Target Name="CopyLibraryImports" AfterTargets="Compile">
+		<PropertyGroup>
+			<GeneratedFilePath>$(MSBuildProjectDirectory)/obj/$(Configuration)/net8.0/generated/Microsoft.Interop.LibraryImportGenerator/Microsoft.Interop.LibraryImportGenerator/LibraryImports.g.cs</GeneratedFilePath>
+			<DestinationDir>$(MSBuildProjectDirectory)/LibraryImportGenerator/</DestinationDir>
+			<DestinationPath>$(DestinationDir)/LibraryImports.g.cs</DestinationPath>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(DestinationDir)" Condition="!Exists('$(DestinationDir)')" />
+
+		<Copy SourceFiles="$(GeneratedFilePath)"
+			  DestinationFiles="$(DestinationPath)"
+			  Condition="Exists('$(GeneratedFilePath)')" />
+
+		<Warning Text="LibraryImports.g.cs not found at $(GeneratedFilePath)"
+				 Condition="!Exists('$(GeneratedFilePath)')" />
+	</Target>
 </Project>

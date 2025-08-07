@@ -1,8 +1,7 @@
-namespace UltralightNet.Binaries
+namespace UltralightNet.Binaries;
+
+public static class Binaries
 {
-	public static class Binaries
-	{
-		// Do we even need here anything at all?
-		// public static bool IsMinified => false;
-	}
+	// Do we even need here anything at all?
+	// public static bool IsMinified => false;
 }

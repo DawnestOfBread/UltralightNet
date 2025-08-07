@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Threading;
+using UltralightNet.Enums;
+using UltralightNet.Structs;
 
 namespace UltralightNet.Test;
 
@@ -7,8 +9,12 @@ namespace UltralightNet.Test;
 [Trait("Category", "Renderer")]
 public sealed class ViewTest
 {
+	public ViewTest(RendererFixture fixture)
+	{
+		Renderer = fixture.Renderer;
+	}
+
 	private Renderer Renderer { get; }
-	public ViewTest(RendererFixture fixture) => Renderer = fixture.Renderer;
 
 	[Fact]
 	[Trait("Network", "Required")]
@@ -19,26 +25,26 @@ public sealed class ViewTest
 		Assert.Equal(512u, view.Width);
 		Assert.Equal(512u, view.Height);
 
-		bool OnChangeTitle = false;
-		bool OnChangeURL = false;
+		var OnChangeTitle = false;
+		var OnChangeURL = false;
 
-		view.OnChangeTitle += (title) =>
+		view.OnChangeTitle += title =>
 		{
 			Assert.Contains("GitHub", title);
 			OnChangeTitle = true;
 		};
 
-		view.OnChangeURL += (url) =>
+		view.OnChangeUrl += url =>
 		{
 			Assert.Equal("https://github.com/", url);
 			OnChangeURL = true;
 		};
 
-		view.URL = "https://github.com/";
+		view.Url = "https://github.com/";
 
 		var sw = Stopwatch.StartNew();
 
-		while (view.URL == "")
+		while (view.Url == "")
 		{
 			if (sw.Elapsed > TimeSpan.FromSeconds(10)) throw new TimeoutException("Couldn't load page in 10 seconds.");
 
@@ -48,17 +54,19 @@ public sealed class ViewTest
 
 		Renderer.Render();
 
-		Assert.Equal("https://github.com/", view.URL);
+		Assert.Equal("https://github.com/", view.Url);
 		Assert.Contains("GitHub", view.Title);
 		Assert.True(OnChangeTitle);
 		Assert.True(OnChangeURL);
 	}
+
 	[Fact]
 	public void HTML()
 	{
 		using var view = Renderer.CreateView(512, 512);
-		view.HTML = "<html />";
+		view.Html = "<html />";
 	}
+
 	[Fact]
 	public void JSTest()
 	{
@@ -66,26 +74,30 @@ public sealed class ViewTest
 		Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 		Assert.True(string.IsNullOrEmpty(exception));
 
-		bool called = false;
+		var called = false;
 		view.OnAddConsoleMessage += (_, _, _, _, _, _) => called = true;
 		view.EvaluateScript("console.log(123)", out _);
 
 		Assert.True(called);
 	}
+
 	[Fact]
 	public void EventTest()
 	{
 		using var view = Renderer.CreateView(256, 256);
-		using var keyEvent = ULKeyEvent.Create(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false);
+		using var keyEvent = UlKeyEvent.Create(KeyEventType.Char, KeyEventModifiers.ShiftKey, 0, 0, "A", "A", false,
+			false, false);
 		view.FireKeyEvent(keyEvent);
-		view.FireMouseEvent(new ULMouseEvent() { Type = ULMouseEventType.MouseDown, X = 100, Y = 100, Button = ULMouseEventButton.Left });
-		view.FireScrollEvent(new() { Type = ULScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
+		view.FireMouseEvent(new UlMouseEvent
+			{ Type = MouseEventType.MouseDown, X = 100, Y = 100, Button = MouseEventButton.Left });
+		view.FireScrollEvent(new UlScrollEvent { Type = ScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
 	}
+
 	[Fact]
 	public void InspectorView()
 	{
 		using var view = Renderer.CreateView(256, 256);
-		view.OnCreateInspectorView = (bool isLocal, string inspectedUrl) => throw new NotImplementedException(); // TODO
+		view.OnCreateInspectorView = (isLocal, inspectedUrl) => throw new NotImplementedException(); // TODO
 
 		var inspectorView = view.CreateLocalInspectorView();
 		Assert.NotNull(inspectorView);

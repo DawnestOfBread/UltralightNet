@@ -1,4 +1,4 @@
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,13 +13,16 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-public static unsafe partial class Methods
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+[SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
+internal static unsafe partial class Methods
 {
 	public const string LibUltralight = "Ultralight";
 
-	static Methods() => Preload();
+	static Methods()
+	{
+		Preload();
+	}
 
 	[LibraryImport(LibUltralight)]
 	public static partial byte* ulVersionString();
@@ -34,25 +37,27 @@ public static unsafe partial class Methods
 	public static partial uint ulVersionPatch();
 
 	/// <summary>
-	/// Preload Ultralight binaries on OSX/MacOS
+	///     Preload Ultralight binaries on OSX/MacOS
 	/// </summary>
 	/// <remarks>UltralightCore, WebCore, Ultralight</remarks>
 	public static void Preload()
 	{
-#if NET5_0_OR_GREATER
-		bool isOSX = OperatingSystem.IsMacOS();
-		if (isOSX)
+		#if NET5_0_OR_GREATER
+		bool isOsx = OperatingSystem.IsMacOS();
+		if (isOsx)
 		{
-			ReadOnlySpan<string> libsOSX = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
+			ReadOnlySpan<string> libsOsx =
+ new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
 			string? absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
 			if (string.IsNullOrEmpty(absoluteAssemblyLocationDir)) return;
-			string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
+			string absoluteRuntimeNativesDir =
+ Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
 
-			Assembly assembly = typeof(UltralightNet.Binaries.Binaries).Assembly;
-			DllImportSearchPath searchPath = DllImportSearchPath.UseDllDirectoryForDependencies;
+			var assembly = typeof(UltralightNet.Binaries.Binaries).Assembly;
+			const DllImportSearchPath searchPath = DllImportSearchPath.UseDllDirectoryForDependencies;
 
-			foreach (string lib in libsOSX)
+			foreach (string lib in libsOsx)
 			{
 				if (!NativeLibrary.TryLoad(lib, assembly, searchPath, out nint _))
 				{
@@ -61,18 +66,17 @@ public static unsafe partial class Methods
 				}
 			}
 		}
-#endif
+		#endif
 	}
 
 	// backported from net8.0 for compatibility
 	internal static TTo BitCast<TFrom, TTo>(TFrom from) where TFrom : unmanaged where TTo : unmanaged
-#if !NET8_0_OR_GREATER
+	#if !NET8_0_OR_GREATER
 	{
-		System.Diagnostics.Debug.Assert(sizeof(TFrom) == sizeof(TTo));
+		Debug.Assert(sizeof(TFrom) == sizeof(TTo));
 		return Unsafe.As<TFrom, TTo>(ref from);
 	}
-#else
+	#else
 	=> Unsafe.BitCast<TFrom, TTo>(from);
-#endif
-
+	#endif
 }

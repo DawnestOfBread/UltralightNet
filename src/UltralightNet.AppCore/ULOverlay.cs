@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
@@ -60,7 +59,7 @@ public static partial class AppCoreMethods
 }
 
 [NativeMarshalling(typeof(Marshaller))]
-public unsafe sealed class ULOverlay : NativeContainer
+public sealed unsafe class ULOverlay : NativeContainer
 {
 	private ULOverlay(void* ptr, Renderer renderer, View? view)
 	{
@@ -68,10 +67,11 @@ public unsafe sealed class ULOverlay : NativeContainer
 		if (view is null)
 		{
 			view = View.FromHandle(AppCoreMethods.ulOverlayGetView(this), false);
-			renderer.views[view.GetUserData()] = new(view);
+			renderer.Views[view.GetUserData()] = new WeakReference<View>(view);
 			view.Renderer = renderer;
 			view.SetUpCallbacks();
 		}
+
 		View = view;
 	}
 
@@ -85,15 +85,35 @@ public unsafe sealed class ULOverlay : NativeContainer
 		get => new(AppCoreMethods.ulOverlayGetX(this), AppCoreMethods.ulOverlayGetY(this));
 		set => AppCoreMethods.ulOverlayMoveTo(this, value.X, value.Y);
 	}
-	public void Resize(uint width, uint height) => AppCoreMethods.ulOverlayResize(this, width, height);
 
 	public bool IsHidden => AppCoreMethods.ulOverlayIsHidden(this);
-	public void Hide() => AppCoreMethods.ulOverlayHide(this);
-	public void Show() => AppCoreMethods.ulOverlayShow(this);
 
 	public bool HasFocus => AppCoreMethods.ulOverlayHasFocus(this);
-	public void Focus() => AppCoreMethods.ulOverlayFocus(this);
-	public void Unfocus() => AppCoreMethods.ulOverlayUnfocus(this);
+
+	public void Resize(uint width, uint height)
+	{
+		AppCoreMethods.ulOverlayResize(this, width, height);
+	}
+
+	public void Hide()
+	{
+		AppCoreMethods.ulOverlayHide(this);
+	}
+
+	public void Show()
+	{
+		AppCoreMethods.ulOverlayShow(this);
+	}
+
+	public void Focus()
+	{
+		AppCoreMethods.ulOverlayFocus(this);
+	}
+
+	public void Unfocus()
+	{
+		AppCoreMethods.ulOverlayUnfocus(this);
+	}
 
 	public override void Dispose()
 	{
@@ -102,15 +122,29 @@ public unsafe sealed class ULOverlay : NativeContainer
 		base.Dispose();
 	}
 
-	internal static unsafe ULOverlay FromHandle(void* ptr, Renderer renderer, View? view = null) => new(ptr, renderer, view);
+	internal static ULOverlay FromHandle(void* ptr, Renderer renderer, View? view = null)
+	{
+		return new ULOverlay(ptr, renderer, view);
+	}
 
 	[CustomMarshaller(typeof(ULOverlay), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller
 	{
 		private ULOverlay overlay;
 
-		public void FromManaged(ULOverlay overlay) => this.overlay = overlay;
-		public readonly unsafe void* ToUnmanaged() => overlay.Handle;
-		public readonly void Free() => GC.KeepAlive(overlay);
+		public void FromManaged(ULOverlay overlay)
+		{
+			this.overlay = overlay;
+		}
+
+		public readonly void* ToUnmanaged()
+		{
+			return overlay.Handle;
+		}
+
+		public readonly void Free()
+		{
+			GC.KeepAlive(overlay);
+		}
 	}
 }

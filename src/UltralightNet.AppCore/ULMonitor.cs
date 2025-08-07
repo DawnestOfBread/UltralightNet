@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
@@ -18,7 +17,7 @@ public static partial class AppCoreMethods
 }
 
 [NativeMarshalling(typeof(Marshaller))]
-public unsafe sealed class ULMonitor : NativeContainer
+public sealed unsafe class ULMonitor : NativeContainer
 {
 	internal readonly ULApp app;
 
@@ -32,14 +31,20 @@ public unsafe sealed class ULMonitor : NativeContainer
 	public uint Width => AppCoreMethods.ulMonitorGetWidth(this);
 	public uint Height => AppCoreMethods.ulMonitorGetHeight(this);
 
-	public ULWindow CreateWindow(uint width, uint height, bool fullscreen = false, ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable)
+	public ULWindow CreateWindow(uint width, uint height, bool fullscreen = false,
+		ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable)
 	{
-		if (flags.HasFlag(ULWindowFlags.Borderless) && (flags.HasFlag(ULWindowFlags.Maximizable) || flags.HasFlag(ULWindowFlags.Titled))) throw new ArgumentException("Invalid combination of flags.", nameof(flags));
+		if (flags.HasFlag(ULWindowFlags.Borderless) &&
+		    (flags.HasFlag(ULWindowFlags.Maximizable) || flags.HasFlag(ULWindowFlags.Titled)))
+			throw new ArgumentException("Invalid combination of flags.", nameof(flags));
 		var window = ULWindow.FromHandle(AppCoreMethods.ulCreateWindow(this, width, height, fullscreen, flags), app);
 		return window;
 	}
 
-	internal static ULMonitor FromHandle(void* ptr, ULApp app) => new(ptr, app);
+	internal static ULMonitor FromHandle(void* ptr, ULApp app)
+	{
+		return new ULMonitor(ptr, app);
+	}
 
 	public override void Dispose()
 	{
@@ -52,8 +57,19 @@ public unsafe sealed class ULMonitor : NativeContainer
 	{
 		private ULMonitor monitor;
 
-		public void FromManaged(ULMonitor monitor) => this.monitor = monitor;
-		public readonly unsafe void* ToUnmanaged() => monitor.Handle;
-		public readonly void Free() => GC.KeepAlive(monitor);
+		public void FromManaged(ULMonitor monitor)
+		{
+			this.monitor = monitor;
+		}
+
+		public readonly void* ToUnmanaged()
+		{
+			return monitor.Handle;
+		}
+
+		public readonly void Free()
+		{
+			GC.KeepAlive(monitor);
+		}
 	}
 }

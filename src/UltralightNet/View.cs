@@ -1,27 +1,32 @@
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.Callbacks;
-using UltralightNet.JavaScript.Low;
-using UltralightNet.LowStuff;
+using UltralightNet.Enums;
+using UltralightNet.JavaScript;
+using UltralightNet.Platform.HighPerformance;
+using UltralightNet.Structs;
 
 namespace UltralightNet;
 
-public static unsafe partial class Methods
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal static unsafe partial class Methods
 {
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulCreateView(Renderer renderer, uint width, uint height, in ULViewConfig viewConfig, Session session);
+	public static partial void* ulCreateView(Renderer renderer, uint width, uint height, in UlViewConfig viewConfig,
+		Session session);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulDestroyView(View view);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString))]
+	[return: MarshalUsing(typeof(UlString))]
 	public static partial string ulViewGetURL(View view);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString))]
+	[return: MarshalUsing(typeof(UlString))]
 	public static partial string ulViewGetTitle(View view);
 
 	[LibraryImport(LibUltralight)]
@@ -55,31 +60,32 @@ public static unsafe partial class Methods
 	public static partial nuint ulViewGetSurface(View view);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewLoadHTML(View view, [MarshalUsing(typeof(ULString))] string html_string);
+	public static partial void ulViewLoadHTML(View view, [MarshalUsing(typeof(UlString))] string html_string);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewLoadURL(View view, [MarshalUsing(typeof(ULString))] string url_string);
+	public static partial void ulViewLoadURL(View view, [MarshalUsing(typeof(UlString))] string url_string);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewResize(View view, uint width, uint height);
 
 	//todo: JavaScriptCore bindings
 	[LibraryImport(LibUltralight)]
-	public static partial JSContextRef ulViewLockJSContext(View view);
+	public static partial JsContextRef ulViewLockJSContext(View view);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewUnlockJSContext(View view);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString))]
-	public static partial string ulViewEvaluateScript(View view, [MarshalUsing(typeof(ULString))] string js, [MarshalUsing(typeof(ULString))] out string exception);
+	[return: MarshalUsing(typeof(UlString))]
+	public static partial string ulViewEvaluateScript(View view, [MarshalUsing(typeof(UlString))] string js,
+		[MarshalUsing(typeof(UlString))] out string exception);
 
-	/// <summary>Check if can navigate backwards in history.</summary>
+	/// <summary>Check if you can navigate backwards in history.</summary>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewCanGoBack(View view);
 
-	/// <summary>Check if can navigate forwards in history.</summary>
+	/// <summary>Check if you can navigate forwards in history.</summary>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewCanGoForward(View view);
@@ -106,95 +112,125 @@ public static unsafe partial class Methods
 
 	/// <summary>Give focus to the View.</summary>
 	/// <remarks>
-	/// You should call this to give visual indication that the View has input
-	/// focus (changes active text selection colors, for example).
+	///     You should call this to give visual indication that the View has input
+	///     focus (changes active text selection colors, for example).
 	/// </remarks>
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewFocus(View view);
 
 	/// <summary>Remove focus from the View and unfocus any focused input elements.</summary>
 	/// <remarks>
-	/// You should call this to give visual indication that the View has lost
-	/// input focus.
+	///     You should call this to give visual indication that the View has lost
+	///     input focus.
 	/// </remarks>
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewUnfocus(View view);
 
-	/// <summary>Whether or not the View has focus.</summary>
+	/// <summary>Whether the View has focus.</summary>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewHasFocus(View view);
 
-	/// <summary>Whether or not the View has an input element with visible keyboard focus (indicated by a blinking caret).</summary>
+	/// <summary>Whether the View has an input element with visible keyboard focus (indicated by a blinking caret).</summary>
 	/// <remarks>
-	/// You can use this to decide whether or not the View should consume
-	/// keyboard input events (useful in games with mixed UI and key handling).
+	///     You can use this to decide whether the View should consume
+	///     keyboard input events (useful in games with mixed UI and key handling).
 	/// </remarks>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewHasInputFocus(View view);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewFireKeyEvent(View view, ULKeyEvent keyEvent);
+	public static partial void ulViewFireKeyEvent(View view, UlKeyEvent keyEvent);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewFireMouseEvent(View view, ULMouseEvent* mouseEvent);
+	public static partial void ulViewFireMouseEvent(View view, UlMouseEvent* mouseEvent);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewFireScrollEvent(View view, ULScrollEvent* scrollEvent);
+	public static partial void ulViewFireScrollEvent(View view, UlScrollEvent* scrollEvent);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetChangeTitleCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetChangeTitleCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, UlString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetChangeURLCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetChangeURLCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, UlString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetChangeTooltipCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetChangeTooltipCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, UlString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetChangeCursorCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULCursor, void> callback, nuint id);
+	internal static partial void ulViewSetChangeCursorCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, Cursor, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetAddConsoleMessageCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULMessageSource, ULMessageLevel, ULString*, uint, uint, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetAddConsoleMessageCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, MessageSource, MessageLevel, UlString*, uint, uint, UlString*, void
+			> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetCreateChildViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, ULString*, bool, ULIntRect, void*> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetCreateChildViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, ULString*, byte, ULIntRect, void*> callback, nuint id);
+	internal static partial void ulViewSetCreateChildViewCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, UlString*, UlString*, bool, UlIntRect, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetCreateInspectorViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, bool, ULString*, void*> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetCreateInspectorViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, byte, ULString*, void*> callback, nuint id);
+	internal static partial void ulViewSetCreateChildViewCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, UlString*, UlString*, byte, UlIntRect, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetBeginLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetBeginLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetCreateInspectorViewCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, bool, UlString*, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetFinishLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetFinishLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetCreateInspectorViewCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, byte, UlString*, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetFailLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, ULString*, ULString*, int, void> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetFailLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, ULString*, ULString*, int, void> callback, nuint id);
+	internal static partial void ulViewSetBeginLoadingCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, UlString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetWindowObjectReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetWindowObjectReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetBeginLoadingCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, UlString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetDOMReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetDOMReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
+	internal static partial void ulViewSetFinishLoadingCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, UlString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetUpdateHistoryCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, void> callback, nuint id);
+	internal static partial void ulViewSetFinishLoadingCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, UlString*, void> callback, nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetFailLoadingCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, UlString*, UlString*, UlString*, int, void> callback,
+		nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetFailLoadingCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, UlString*, UlString*, UlString*, int, void> callback,
+		nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetWindowObjectReadyCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, UlString*, void> callback, nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetWindowObjectReadyCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, UlString*, void> callback, nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetDOMReadyCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, UlString*, void> callback, nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetDOMReadyCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, UlString*, void> callback, nuint id);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetUpdateHistoryCallback(View view,
+		delegate* unmanaged[Cdecl]<nuint, void*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetNeedsPaint(View view, [MarshalAs(UnmanagedType.U1)] bool needs_paint);
@@ -208,8 +244,12 @@ public static unsafe partial class Methods
 }
 
 [NativeMarshalling(typeof(Marshaller))]
+[SuppressMessage("ReSharper", "UnassignedField.Global")]
 public sealed unsafe class View : NativeContainer
 {
+	public CreateChildViewCallback? OnCreateChildView;
+	public CreateInspectorViewCallback? OnCreateInspectorView;
+
 	protected override void* Handle
 	{
 		get
@@ -218,22 +258,30 @@ public sealed unsafe class View : NativeContainer
 			return base.Handle;
 		}
 	}
+
 	internal Renderer? Renderer { get; set; }
 
-	//private JSContext Context { get; set; }
-	//private JSContext? lockedContext;
-
-	public string URL
+	public string Url
 	{
 		get => Methods.ulViewGetURL(this);
 		set => Methods.ulViewLoadURL(this, value);
 	}
-	public string HTML { set => Methods.ulViewLoadHTML(this, value); }
-	public string Title { get => Methods.ulViewGetTitle(this); }
+
+	public string Html
+	{
+		set => Methods.ulViewLoadHTML(this, value);
+	}
+
+	public string Title => Methods.ulViewGetTitle(this);
 
 	public uint Width => Methods.ulViewGetWidth(this);
 	public uint Height => Methods.ulViewGetHeight(this);
-	public double DeviceScale { get => Methods.ulViewGetDeviceScale(this); set => Methods.ulViewSetDeviceScale(this, value); }
+
+	public double DeviceScale
+	{
+		get => Methods.ulViewGetDeviceScale(this);
+		set => Methods.ulViewSetDeviceScale(this, value);
+	}
 
 	public bool IsAccelerated => Methods.ulViewIsAccelerated(this);
 	public bool IsTransparent => Methods.ulViewIsTransparent(this);
@@ -241,88 +289,126 @@ public sealed unsafe class View : NativeContainer
 	public bool IsLoading => Methods.ulViewIsLoading(this);
 
 	/// <summary>
-	/// Provides info used to display texture in your application
+	///     Provides info used to display texture in your application
 	/// </summary>
-	/// <remarks>Only valid when <see cref="ULGPUDriver"/> is used</remarks>
+	/// <remarks>Only valid when <see cref="UlGpuDriver" /> is used</remarks>
 	public RenderTarget RenderTarget
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		get => Methods.ulViewGetRenderTarget(this);
 	}
 
-	public ULSurface? Surface
+	public UlSurface? Surface
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		get
 		{
-			nuint surfaceHandle = Methods.ulViewGetSurface(this);
+			var surfaceHandle = Methods.ulViewGetSurface(this);
 			if (surfaceHandle is 0) return null;
-			return ULSurface.FromHandle(surfaceHandle);
+			return UlSurface.FromHandle(surfaceHandle);
 		}
 	}
-
-	public void Resize(in uint width, in uint height) => Methods.ulViewResize(this, width, height);
-
-	public JSContextRef LockJSContext() => Methods.ulViewLockJSContext(this);
-	public void UnlockJSContext() => Methods.ulViewUnlockJSContext(this);
-
-	/*public ref readonly JSContext LockJSContext()
-	{
-		void* contextHandle = Methods.ulViewLockJSContext(this);
-		Context.OnLocked(contextHandle);
-		lockedContext = Context;
-		return ref lockedContext!;
-	}
-	public void UnlockJSContext()
-	{
-		lockedContext = null;
-		Methods.ulViewUnlockJSContext(this);
-	}*/
-
-	public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(this, js_string, out exception);
 
 	public bool CanGoBack => Methods.ulViewCanGoBack(this);
 	public bool CanGoForward => Methods.ulViewCanGoForward(this);
 
-	public void GoBack() => Methods.ulViewGoBack(this);
-	public void GoForward() => Methods.ulViewGoForward(this);
-	public void GoToHistoryOffset(in int offset) => Methods.ulViewGoToHistoryOffset(this, offset);
-
-	public void Reload() => Methods.ulViewReload(this);
-	public void Stop() => Methods.ulViewStop(this);
-
-	public void Focus() => Methods.ulViewFocus(this);
-	public void Unfocus() => Methods.ulViewUnfocus(this);
 	public bool HasFocus => Methods.ulViewHasFocus(this);
 	public bool HasInputFocus => Methods.ulViewHasInputFocus(this);
 
-	public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(this, keyEvent);
-	public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(this, &mouseEvent);
-	public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(this, &scrollEvent);
+	public bool NeedsPaint
+	{
+		get => Methods.ulViewGetNeedsPaint(this);
+		set => Methods.ulViewSetNeedsPaint(this, value);
+	}
 
-	public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(this); set => Methods.ulViewSetNeedsPaint(this, value); }
+	public void Resize(in uint width, in uint height)
+	{
+		Methods.ulViewResize(this, width, height);
+	}
 
-	public View? CreateLocalInspectorView()
+	public JsContextRef LockJsContext()
+	{
+		return Methods.ulViewLockJSContext(this);
+	}
+
+	public void UnlockJsContext()
+	{
+		Methods.ulViewUnlockJSContext(this);
+	}
+
+	public string EvaluateScript(string jsString, out string exception)
+	{
+		return Methods.ulViewEvaluateScript(this, jsString, out exception);
+	}
+
+	public void GoBack()
+	{
+		Methods.ulViewGoBack(this);
+	}
+
+	public void GoForward()
+	{
+		Methods.ulViewGoForward(this);
+	}
+
+	public void GoToHistoryOffset(in int offset)
+	{
+		Methods.ulViewGoToHistoryOffset(this, offset);
+	}
+
+	public void Reload()
+	{
+		Methods.ulViewReload(this);
+	}
+
+	public void Stop()
+	{
+		Methods.ulViewStop(this);
+	}
+
+	public void Focus()
+	{
+		Methods.ulViewFocus(this);
+	}
+
+	public void Unfocus()
+	{
+		Methods.ulViewUnfocus(this);
+	}
+
+	public void FireKeyEvent(UlKeyEvent keyEvent)
+	{
+		Methods.ulViewFireKeyEvent(this, keyEvent);
+	}
+
+	public void FireMouseEvent(UlMouseEvent mouseEvent)
+	{
+		Methods.ulViewFireMouseEvent(this, &mouseEvent);
+	}
+
+	public void FireScrollEvent(UlScrollEvent scrollEvent)
+	{
+		Methods.ulViewFireScrollEvent(this, &scrollEvent);
+	}
+
+	public View CreateLocalInspectorView()
 	{
 		var handle = Methods.ulViewCreateLocalInspectorView(this);
-		Debug.Assert(handle is not null);
 		var view = FromHandle(handle, false);
 		view.Renderer = Renderer;
 		return view;
 	}
 
 	public event Action<string>? OnChangeTitle;
-	public event Action<string>? OnChangeURL;
+	public event Action<string>? OnChangeUrl;
 	public event Action<string>? OnChangeTooltip;
-	public event Action<ULCursor>? OnChangeCursor;
+	public event Action<Cursor>? OnChangeCursor;
 	public event AddConsoleMessageCallback? OnAddConsoleMessage;
-	public CreateChildViewCallback? OnCreateChildView;
-	public CreateInspectorViewCallback? OnCreateInspectorView;
 	public event BeginLoadingCallback? OnBeginLoading;
 	public event FinishLoadingCallback? OnFinishLoading;
 	public event FailLoadingCallback? OnFailLoading;
 	public event WindowObjectReadyCallback? OnWindowObjectReady;
-	public event DOMReadyCallback? OnDOMReady;
+	public event DomReadyCallback? OnDomReady;
 	public event Action? OnUpdateHistory;
 
 	internal void SetUpCallbacks()
@@ -343,48 +429,102 @@ public sealed unsafe class View : NativeContainer
 		Methods.ulViewSetUpdateHistoryCallback(this, &NativeOnUpdateHistory, data);
 	}
 
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnChangeTitle(nuint userData, void* caller, ULString* title) => GetView(userData, caller).OnChangeTitle?.Invoke(title->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnChangeURL(nuint userData, void* caller, ULString* url) => GetView(userData, caller).OnChangeURL?.Invoke(url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnChangeTooltip(nuint userData, void* caller, ULString* tooltip) => GetView(userData, caller).OnChangeTooltip?.Invoke(tooltip->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnChangeCursor(nuint userData, void* caller, ULCursor cursor) => GetView(userData, caller).OnChangeCursor?.Invoke(cursor);
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnAddConsoleMessage(nuint userData, void* caller, ULMessageSource source, ULMessageLevel level, ULString* message, uint lineNumber, uint columnNumber, ULString* sourceId) => GetView(userData, caller).OnAddConsoleMessage?.Invoke(source, level, message->ToString(), lineNumber, columnNumber, sourceId->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void* NativeOnCreateChildView(nuint userData, void* caller, ULString* openerUrl, ULString* targetUrl, byte isPopup, ULIntRect popupRect)
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnChangeTitle(nuint userData, void* caller, UlString* title)
 	{
-#if DEBUG
-		throw new NotImplementedException("NativeOnCreateChildView");
-#else
-		var view = GetView(userData, caller).OnCreateChildView?.Invoke(openerUrl->ToString(), targetUrl->ToString(), isPopup != 0, popupRect);
-		return view is null ? null : view.Handle;
-#endif
+		GetView(userData, caller).OnChangeTitle?.Invoke(title->ToString());
 	}
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void* NativeOnCreateInspectorView(nuint userData, void* caller, byte isLocal, ULString* inspectedUrl)
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnChangeURL(nuint userData, void* caller, UlString* url)
 	{
-#if DEBUG
+		GetView(userData, caller).OnChangeUrl?.Invoke(url->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnChangeTooltip(nuint userData, void* caller, UlString* tooltip)
+	{
+		GetView(userData, caller).OnChangeTooltip?.Invoke(tooltip->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnChangeCursor(nuint userData, void* caller, Cursor cursor)
+	{
+		GetView(userData, caller).OnChangeCursor?.Invoke(cursor);
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnAddConsoleMessage(nuint userData, void* caller, MessageSource source,
+		MessageLevel level, UlString* message, uint lineNumber, uint columnNumber, UlString* sourceId)
+	{
+		GetView(userData, caller).OnAddConsoleMessage?.Invoke(source, level, message->ToString(), lineNumber,
+			columnNumber, sourceId->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void* NativeOnCreateChildView(nuint userData, void* caller, UlString* openerUrl, UlString* targetUrl,
+		byte isPopup, UlIntRect popupRect)
+	{
+		#if DEBUG
 		throw new NotImplementedException("NativeOnCreateChildView");
-#else
+		#else
+		var view = GetView(userData, caller).OnCreateChildView
+			?.Invoke(openerUrl->ToString(), targetUrl->ToString(), isPopup != 0 ? popupRect : null);
+		return view is null ? null : view.Handle;
+		#endif
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void* NativeOnCreateInspectorView(nuint userData, void* caller, byte isLocal, UlString* inspectedUrl)
+	{
+		#if DEBUG
+		throw new NotImplementedException("NativeOnCreateChildView");
+		#else
 		var view = GetView(userData, caller).OnCreateInspectorView?.Invoke(isLocal != 0, inspectedUrl->ToString());
 		return view is null ? null : view.Handle;
-#endif
+		#endif
 	}
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnBeginLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnBeginLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnFinishLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnFinishLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnFailLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url, ULString* description, ULString* errorDomain, int errorCode) => GetView(userData, caller).OnFailLoading?.Invoke(frameId, isMainFrame != 0, url->ToString(), description->ToString(), errorDomain->ToString(), errorCode);
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnWindowObjectReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnWindowObjectReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnDOMReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnDOMReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-	static void NativeOnUpdateHistory(nuint userData, void* caller) => GetView(userData, caller).OnUpdateHistory?.Invoke();
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnBeginLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame,
+		UlString* url)
+	{
+		GetView(userData, caller).OnBeginLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnFinishLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame,
+		UlString* url)
+	{
+		GetView(userData, caller).OnFinishLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnFailLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame,
+		UlString* url, UlString* description, UlString* errorDomain, int errorCode)
+	{
+		GetView(userData, caller).OnFailLoading?.Invoke(frameId, isMainFrame != 0, url->ToString(),
+			description->ToString(), errorDomain->ToString(), errorCode);
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnWindowObjectReady(nuint userData, void* caller, ulong frameId, byte isMainFrame,
+		UlString* url)
+	{
+		GetView(userData, caller).OnWindowObjectReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnDOMReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, UlString* url)
+	{
+		GetView(userData, caller).OnDomReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void NativeOnUpdateHistory(nuint userData, void* caller)
+	{
+		GetView(userData, caller).OnUpdateHistory?.Invoke();
+	}
 
 
 	public override void Dispose()
@@ -394,30 +534,46 @@ public sealed unsafe class View : NativeContainer
 		base.Dispose();
 	}
 
-	internal static View FromHandle(void* handle, bool dispose = true) => new() { Handle = handle, Owns = dispose };
+	internal static View FromHandle(void* handle, bool dispose = true)
+	{
+		return new View { Handle = handle, Owns = dispose };
+	}
+
+	private static View GetView(nuint userData, void* caller)
+	{
+		if (Renderer.Renderers[userData].TryGetTarget(out var renderer))
+		{
+			if (renderer.Views[(nuint)caller].TryGetTarget(out var view)) return view;
+
+			throw new ObjectDisposedException(nameof(View));
+		}
+
+		throw new ObjectDisposedException(nameof(UltralightNet.Renderer));
+	}
+
+	internal nuint GetUserData()
+	{
+		return (nuint)Handle;
+	}
 
 	[CustomMarshaller(typeof(View), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller
 	{
-		private View view;
+		private View _view;
 
-		public void FromManaged(View view) => this.view = view;
-		public readonly void* ToUnmanaged() => view.Handle;
-		public readonly void Free() => GC.KeepAlive(view);
-	}
-
-	static View GetView(nuint userData, void* caller)
-	{
-		if (Renderer.renderers[userData].TryGetTarget(out var renderer))
+		public void FromManaged(View view)
 		{
-			if (renderer.views[(nuint)caller].TryGetTarget(out var view))
-			{
-				return view;
-			}
-			else throw new ObjectDisposedException(nameof(View));
+			_view = view;
 		}
-		else throw new ObjectDisposedException(nameof(UltralightNet.Renderer));
-	}
 
-	internal nuint GetUserData() => (nuint)Handle;
+		public readonly void* ToUnmanaged()
+		{
+			return _view.Handle;
+		}
+
+		public readonly void Free()
+		{
+			GC.KeepAlive(_view);
+		}
+	}
 }

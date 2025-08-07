@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using UltralightNet.Enums;
 using UltralightNet.Platform.HighPerformance;
 
 namespace UltralightNet.Platform
@@ -6,45 +7,40 @@ namespace UltralightNet.Platform
 	namespace HighPerformance
 	{
 		/// <summary>
-		/// <see cref="ILogger" /> native definition.
+		///     <see cref="ILogger" /> native definition.
 		/// </summary>
-		public unsafe struct ULLogger
+		public unsafe struct UlLogger
 		{
-#if !NETSTANDARD
-			public delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void> LogMessage;
-#else
+			#if !NETSTANDARD
+			public delegate* unmanaged[Cdecl]<LogLevel, UlString*, void> LogMessage;
+			#else
 			public void* LogMessage;
-#endif
+			#endif
 		}
 	}
+
 	public interface ILogger
 	{
-		void LogMessage(ULLogLevel logLevel, string message);
+		void LogMessage(LogLevel logLevel, string message);
 
-#if !NETSTANDARD2_0
-		virtual ULLogger? GetNativeStruct() => null;
-#else
+		#if !NETSTANDARD2_0
+		virtual UlLogger? GetNativeStruct()
+		{
+			return null;
+		}
+		#else
 		ULLogger? GetNativeStruct();
-#endif
+		#endif
 		internal sealed unsafe class Wrapper
 		{
-			readonly ILogger instance;
-			readonly ULLogger _NativeStruct;
-			public ULLogger NativeStruct
-			{
-				get
-				{
-					if (IsDisposed) throw new ObjectDisposedException(nameof(Wrapper));
-					return _NativeStruct;
-				}
-				private init => _NativeStruct = value;
-			}
-			readonly GCHandle handle;
-			public bool IsDisposed { get; private set; }
+			private readonly UlLogger _nativeStruct;
+
+			private GCHandle _handle;
+			private readonly ILogger _instance;
 
 			public Wrapper(ILogger instance)
 			{
-				this.instance = instance;
+				_instance = instance;
 				var nativeStruct = instance.GetNativeStruct();
 				if (nativeStruct is not null)
 				{
@@ -52,18 +48,39 @@ namespace UltralightNet.Platform
 					return;
 				}
 
-				NativeStruct = new() { LogMessage = (delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void>)Helper.AllocateDelegate((ULLogLevel logLevel, ULString* message) => instance.LogMessage(logLevel, message->ToString()), out handle) };
+				NativeStruct = new UlLogger
+				{
+					LogMessage = (delegate* unmanaged[Cdecl]<LogLevel, UlString*, void>)Helper.AllocateDelegate(
+						(LogLevel logLevel, UlString* message) => instance.LogMessage(logLevel, message->ToString()),
+						out _handle)
+				};
 			}
+
+			public UlLogger NativeStruct
+			{
+				get
+				{
+					if (IsDisposed) throw new ObjectDisposedException(nameof(Wrapper));
+					return _nativeStruct;
+				}
+				private init => _nativeStruct = value;
+			}
+
+			public bool IsDisposed { get; private set; }
 
 			public void Dispose()
 			{
 				if (IsDisposed) return;
-				if (handle.IsAllocated) handle.Free();
+				if (_handle.IsAllocated) _handle.Free();
 
 				GC.SuppressFinalize(this);
 				IsDisposed = true;
 			}
-			~Wrapper() => Dispose();
+
+			~Wrapper()
+			{
+				Dispose();
+			}
 		}
 	}
 }

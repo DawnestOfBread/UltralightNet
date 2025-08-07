@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace UltralightNet.GPUCommon;
 
 /// <summary>
-/// Uniform Buffer data
+///     Uniform Buffer data
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Size = 768)]
 public struct Uniforms

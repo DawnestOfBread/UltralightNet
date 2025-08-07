@@ -1,8 +1,10 @@
 # UltralightNet [![NuGet](https://img.shields.io/nuget/v/UltralightNet.svg)](https://www.nuget.org/packages/UltralightNet/) [![Build & Test](https://github.com/SupinePandora43/UltralightNet/actions/workflows/build.yml/badge.svg)](https://github.com/SupinePandora43/UltralightNet/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/SupinePandora43/UltralightNet/branch/master/graph/badge.svg?token=QSP6YT7UM8)](https://codecov.io/gh/SupinePandora43/UltralightNet)
 
-**[Ultralight](https://ultralig.ht) C#/.NET** bindings. UltralightNet makes it easy to use HTML within .NET applications.
+**[Ultralight](https://ultralig.ht) C#/.NET** bindings. UltralightNet makes it easy to use HTML within .NET
+applications.
 
-You can learn more about Ultralight at [Ultralight's official website](https://ultralig.ht) and [Ultralight's documentation](https://docs.ultralig.ht/docs).
+You can learn more about Ultralight at [Ultralight's official website](https://ultralig.ht)
+and [Ultralight's documentation](https://docs.ultralig.ht/docs).
 
 ## Supported Frameworks
 

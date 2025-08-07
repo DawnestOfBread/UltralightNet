@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using UltralightNet.Handles;
 using UltralightNet.Platform.HighPerformance;
 
 namespace UltralightNet.Platform
@@ -6,50 +7,45 @@ namespace UltralightNet.Platform
 	namespace HighPerformance
 	{
 		/// <summary>
-		/// <see cref="IFontLoader" /> native definition.
+		///     <see cref="IFontLoader" /> native definition.
 		/// </summary>
-		public unsafe struct ULFontLoader
+		public unsafe struct UlFontLoader
 		{
-#if !NETSTANDARD
-			public delegate* unmanaged[Cdecl]<ULString*> GetFallbackFont;
-			public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*> GetFallbackFontForCharacters;
-			public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile> Load;
-#else
+			#if !NETSTANDARD
+			public delegate* unmanaged[Cdecl]<UlString*> GetFallbackFont;
+			public delegate* unmanaged[Cdecl]<UlString*, int, bool, UlString*> GetFallbackFontForCharacters;
+			public delegate* unmanaged[Cdecl]<UlString*, int, bool, UlFontFile> Load;
+			#else
 			public void* GetFallbackFont, GetFallbackFontForCharacters, Load;
-#endif
+			#endif
 		}
 	}
+
 	public interface IFontLoader
 	{
 		string GetFallbackFont();
 		string GetFallbackFontForCharacters(string text, int weight, bool italic);
-		ULFontFile Load(string font, int weight, bool italic);
+		UlFontFile Load(string font, int weight, bool italic);
 
-#if !NETSTANDARD2_0
-		virtual ULFontLoader? GetNativeStruct() => null;
-#else
+		#if !NETSTANDARD2_0
+		virtual UlFontLoader? GetNativeStruct()
+		{
+			return null;
+		}
+		#else
 		ULFontLoader? GetNativeStruct();
-#endif
+		#endif
 
 		internal sealed unsafe class Wrapper : IDisposable
 		{
-			readonly IFontLoader instance;
-			readonly ULFontLoader _NativeStruct;
-			public ULFontLoader NativeStruct
-			{
-				get
-				{
-					if (IsDisposed) throw new ObjectDisposedException(nameof(Wrapper));
-					return _NativeStruct;
-				}
-				private init => _NativeStruct = value;
-			}
-			readonly GCHandle[]? handles;
-			public bool IsDisposed { get; private set; }
+			private readonly UlFontLoader _nativeStruct;
+
+			private readonly GCHandle[]? _handles;
+			private readonly IFontLoader _instance;
 
 			public Wrapper(IFontLoader instance)
 			{
-				this.instance = instance;
+				this._instance = instance;
 				var nativeStruct = instance.GetNativeStruct();
 				if (nativeStruct is not null)
 				{
@@ -57,28 +53,51 @@ namespace UltralightNet.Platform
 					return;
 				}
 
-				handles = new GCHandle[3];
+				_handles = new GCHandle[3];
 
-				NativeStruct = new()
+				NativeStruct = new UlFontLoader
 				{
-					GetFallbackFont = (delegate* unmanaged[Cdecl]<ULString*>)Helper.AllocateDelegate(() => new ULString(instance.GetFallbackFont().AsSpan()).Allocate(), out handles[0]),
-					GetFallbackFontForCharacters = (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*>)Helper.AllocateDelegate((ULString* text, int weight, bool italic) => new ULString(instance.GetFallbackFontForCharacters(text->ToString(), weight, italic).AsSpan()).Allocate(), out handles[1]),
-					Load = (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile>)Helper.AllocateDelegate((ULString* font, int weight, bool italic) => instance.Load(font->ToString(), weight, italic), out handles[2])
+					GetFallbackFont = (delegate* unmanaged[Cdecl]<UlString*>)Helper.AllocateDelegate(
+						() => new UlString(instance.GetFallbackFont().AsSpan()).Allocate(), out _handles[0]),
+					GetFallbackFontForCharacters =
+						(delegate* unmanaged[Cdecl]<UlString*, int, bool, UlString*>)Helper.AllocateDelegate(
+							(UlString* text, int weight, bool italic) =>
+								new UlString(instance.GetFallbackFontForCharacters(text->ToString(), weight, italic)
+									.AsSpan()).Allocate(), out _handles[1]),
+					Load = (delegate* unmanaged[Cdecl]<UlString*, int, bool, UlFontFile>)Helper.AllocateDelegate(
+						(UlString* font, int weight, bool italic) => instance.Load(font->ToString(), weight, italic),
+						out _handles[2])
 				};
 			}
+
+			public UlFontLoader NativeStruct
+			{
+				get
+				{
+					if (IsDisposed) throw new ObjectDisposedException(nameof(Wrapper));
+					return _nativeStruct;
+				}
+				private init => _nativeStruct = value;
+			}
+
+			public bool IsDisposed { get; private set; }
 
 			public void Dispose()
 			{
 				if (IsDisposed) return;
-				if (handles is not null)
-				{
-					foreach (var handle in handles) if (handle.IsAllocated) handle.Free();
-				}
+				if (_handles is not null)
+					foreach (var handle in _handles)
+						if (handle.IsAllocated)
+							handle.Free();
 
 				GC.SuppressFinalize(this);
 				IsDisposed = true;
 			}
-			~Wrapper() => Dispose();
+
+			~Wrapper()
+			{
+				Dispose();
+			}
 		}
 	}
 }

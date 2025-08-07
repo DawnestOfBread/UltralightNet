@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -14,23 +13,27 @@ public struct ULSettings : IEquatable<ULSettings>
 	public bool LoadShadersFromFileSystem = false;
 	public bool ForceCPURenderer = false;
 
-	public ULSettings() { }
+	public ULSettings()
+	{
+	}
 
-	public readonly bool Equals(ULSettings settings) =>
-		DeveloperName == settings.DeveloperName &&
-		AppName == settings.AppName &&
-		FileSystemPath == settings.FileSystemPath &&
-		LoadShadersFromFileSystem == settings.LoadShadersFromFileSystem &&
-		ForceCPURenderer == settings.ForceCPURenderer;
+	public readonly bool Equals(ULSettings settings)
+	{
+		return DeveloperName == settings.DeveloperName &&
+		       AppName == settings.AppName &&
+		       FileSystemPath == settings.FileSystemPath &&
+		       LoadShadersFromFileSystem == settings.LoadShadersFromFileSystem &&
+		       ForceCPURenderer == settings.ForceCPURenderer;
+	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	[CustomMarshaller(typeof(ULSettings), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller
 	{
-		private ULString DeveloperName;
-		private ULString AppName;
+		private UlString DeveloperName;
+		private UlString AppName;
 
-		private ULString FileSystemPath;
+		private UlString FileSystemPath;
 
 		private byte LoadShadersFromFileSystem;
 
@@ -38,14 +41,17 @@ public struct ULSettings : IEquatable<ULSettings>
 
 		public void FromManaged(ULSettings settings)
 		{
-			DeveloperName = new(settings.DeveloperName.AsSpan());
-			AppName = new(settings.AppName.AsSpan());
-			FileSystemPath = new(settings.FileSystemPath.AsSpan());
+			DeveloperName = new UlString(settings.DeveloperName.AsSpan());
+			AppName = new UlString(settings.AppName.AsSpan());
+			FileSystemPath = new UlString(settings.FileSystemPath.AsSpan());
 			LoadShadersFromFileSystem = Methods.BitCast<bool, byte>(settings.LoadShadersFromFileSystem);
 			ForceCPURenderer = Methods.BitCast<bool, byte>(settings.ForceCPURenderer);
 		}
 
-		public readonly Marshaller ToUnmanaged() => this;
+		public readonly Marshaller ToUnmanaged()
+		{
+			return this;
+		}
 
 		public void Free()
 		{

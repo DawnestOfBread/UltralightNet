@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace UltralightNet.Platform.HighPerformance;
+namespace UltralightNet.Platform;
 
 internal static class Helper
 {

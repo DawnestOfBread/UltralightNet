@@ -1,77 +1,95 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
 #if NET7_0_OR_GREATER
 [assembly: DisableRuntimeMarshalling]
 #endif
 
 namespace UltralightNet.AppCore;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-public unsafe static partial class AppCoreMethods
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+[SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
+public static unsafe partial class AppCoreMethods
 {
-	static AppCoreMethods() => Methods.Preload();
+	private const string LibAppCore = "AppCore";
 
-	const string LibAppCore = "AppCore";
+	static AppCoreMethods()
+	{
+		Methods.Preload();
+	}
 
 	[LibraryImport(LibAppCore)]
 	private static partial void ulEnablePlatformFontLoader();
 
-	public static void SetPlatformFontLoader(){
+	public static void SetPlatformFontLoader()
+	{
 		ulEnablePlatformFontLoader();
-		ULPlatform.SetDefaultFontLoader = false;
+		UlPlatform.SetDefaultFontLoader = false;
 	}
 
 	#region ulEnablePlatformFileSystem
-	[DllImport("AppCore", EntryPoint = "ulEnablePlatformFileSystem", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void ulEnablePlatformFileSystemActual(ULString* baseDirectory);
 
-	public static void ulEnablePlatformFileSystem(ULString* baseDirectory)
+	[DllImport("AppCore", EntryPoint = "ulEnablePlatformFileSystem", ExactSpelling = true,
+		CallingConvention = CallingConvention.Cdecl)]
+	private static extern void ulEnablePlatformFileSystemActual(UlString* baseDirectory);
+
+	public static void ulEnablePlatformFileSystem(UlString* baseDirectory)
 	{
 		ulEnablePlatformFileSystemActual(baseDirectory);
 
-		ULPlatform.SetDefaultFileSystem = false;
-		ULPlatform.ErrorMissingResources = false;
+		UlPlatform.SetDefaultFileSystem = false;
+		UlPlatform.ErrorMissingResources = false;
 	}
 
-	public static void ulEnablePlatformFileSystem(string baseDirectory) => ulEnablePlatformFileSystem(baseDirectory.AsSpan());
+	public static void ulEnablePlatformFileSystem(string baseDirectory)
+	{
+		ulEnablePlatformFileSystem(baseDirectory.AsSpan());
+	}
 
 	public static void ulEnablePlatformFileSystem(ReadOnlySpan<char> baseDirectory)
 	{
-		using ULString baseDirectoryUL = new(baseDirectory);
+		using UlString baseDirectoryUL = new(baseDirectory);
 		ulEnablePlatformFileSystem(&baseDirectoryUL);
 	}
 
 	public static void ulEnablePlatformFileSystem(ReadOnlySpan<byte> baseDirectory)
 	{
-		using ULString baseDirectoryUL = new(baseDirectory);
+		using UlString baseDirectoryUL = new(baseDirectory);
 		ulEnablePlatformFileSystem(&baseDirectoryUL);
 	}
-	#endregion ulEnablePlatformFileSystem
-	#region ulEnableDefaultLogger
-	[DllImport("AppCore", EntryPoint = "ulEnableDefaultLogger", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void ulEnableDefaultLoggerActual(ULString* logPath);
 
-	public static void ulEnableDefaultLogger(ULString* logPath){
+	#endregion ulEnablePlatformFileSystem
+
+	#region ulEnableDefaultLogger
+
+	[DllImport("AppCore", EntryPoint = "ulEnableDefaultLogger", ExactSpelling = true,
+		CallingConvention = CallingConvention.Cdecl)]
+	private static extern void ulEnableDefaultLoggerActual(UlString* logPath);
+
+	public static void ulEnableDefaultLogger(UlString* logPath)
+	{
 		ulEnableDefaultLoggerActual(logPath);
 
-		ULPlatform.EnableDefaultLogger = false;
+		UlPlatform.EnableDefaultLogger = false;
 	}
 
-	public static void ulEnableDefaultLogger(string logPath) => ulEnableDefaultLogger(logPath.AsSpan());
+	public static void ulEnableDefaultLogger(string logPath)
+	{
+		ulEnableDefaultLogger(logPath.AsSpan());
+	}
 
 	public static void ulEnableDefaultLogger(ReadOnlySpan<char> logPath)
 	{
-		using ULString logPathUL = new(logPath);
+		using UlString logPathUL = new(logPath);
 		ulEnableDefaultLogger(&logPathUL);
 	}
 
 	public static void ulEnableDefaultLogger(ReadOnlySpan<byte> logPath)
 	{
-		using ULString logPathUL = new(logPath);
+		using UlString logPathUL = new(logPath);
 		ulEnableDefaultLogger(&logPathUL);
 	}
+
 	#endregion ulEnableDefaultLogger
 }

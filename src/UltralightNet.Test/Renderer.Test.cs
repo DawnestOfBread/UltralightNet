@@ -4,10 +4,9 @@ namespace UltralightNet.Test;
 
 [Collection("Renderer")]
 [Trait("Category", "Renderer")]
-public sealed class RendererTest
+public sealed class RendererTest(RendererFixture fixture)
 {
-	private Renderer Renderer { get; }
-	public RendererTest(RendererFixture fixture) => Renderer = fixture.Renderer;
+	private Renderer Renderer { get; } = fixture.Renderer;
 
 	[Fact]
 	public void SessionTest()
@@ -37,6 +36,7 @@ public sealed class RendererTest
 	{
 		Assert.True(Renderer.TryStartRemoteInspectorServer("127.0.0.1", 7676));
 	}
+
 	[Fact]
 	public void MemoryTest()
 	{
@@ -46,8 +46,8 @@ public sealed class RendererTest
 	}
 
 	[Fact]
-	public void GPUDriverNotSet()
+	public void GpuDriverNotSet()
 	{
-		Assert.Throws<Exception>(() => Renderer.CreateView(128, 128, new() { IsAccelerated = true }));
+		Assert.Throws<Exception>(() => Renderer.CreateView(128, 128, new UlViewConfig { IsAccelerated = true }));
 	}
 }
