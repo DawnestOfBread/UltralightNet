@@ -19,24 +19,24 @@ public struct UlGpuState : IEquatable<UlGpuState>
 
 	public bool EnableTexturing
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, bool>(_EnableTexturing);
-		set => _EnableTexturing = UltralightNet.Methods.BitCast<bool, byte>(value);
+		readonly get => Methods.BitCast<byte, bool>(_EnableTexturing);
+		set => _EnableTexturing = Methods.BitCast<bool, byte>(value);
 	}
 
 	private byte _EnableBlend;
 
 	public bool EnableBlend
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, bool>(_EnableBlend);
-		set => _EnableBlend = UltralightNet.Methods.BitCast<bool, byte>(value);
+		readonly get => Methods.BitCast<byte, bool>(_EnableBlend);
+		set => _EnableBlend = Methods.BitCast<bool, byte>(value);
 	}
 
 	private byte _ShaderType;
 
 	public ShaderType ShaderType
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, ShaderType>(_ShaderType);
-		set => _ShaderType = UltralightNet.Methods.BitCast<ShaderType, byte>(value);
+		readonly get => Methods.BitCast<byte, ShaderType>(_ShaderType);
+		set => _ShaderType = Methods.BitCast<ShaderType, byte>(value);
 	}
 
 	public uint RenderBufferId;
@@ -101,8 +101,8 @@ public struct UlGpuState : IEquatable<UlGpuState>
 
 	public bool EnableScissor
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, bool>(_EnableScissor);
-		set => _EnableScissor = UltralightNet.Methods.BitCast<bool, byte>(value);
+		readonly get => Methods.BitCast<byte, bool>(_EnableScissor);
+		set => _EnableScissor = Methods.BitCast<bool, byte>(value);
 	}
 
 	public UlIntRect ScissorRect;

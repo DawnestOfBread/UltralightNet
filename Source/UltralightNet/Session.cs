@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.Marshalling;
 namespace UltralightNet;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static unsafe partial class Methods
+public static unsafe partial class Methods
 {
 	/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
 	[LibraryImport(LibUltralight)]

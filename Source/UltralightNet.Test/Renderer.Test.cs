@@ -48,6 +48,6 @@ public sealed class RendererTest(RendererFixture fixture)
 	[Fact]
 	public void GpuDriverNotSet()
 	{
-		Assert.Throws<Exception>(() => Renderer.CreateView(128, 128, new UlViewConfig { IsAccelerated = true }));
+		Assert.Throws<Exception>(() => Renderer.CreateView(128, 128, new ViewConfig { IsAccelerated = true }));
 	}
 }

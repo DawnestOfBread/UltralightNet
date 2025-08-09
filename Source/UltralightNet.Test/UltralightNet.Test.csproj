@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;</TargetFrameworks>
 		<OutputType>Library</OutputType>
 		<CollectCoverage>true</CollectCoverage>
 	</PropertyGroup>
@@ -11,8 +10,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)"/>
-		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)"/>
+		<PackageReference Include="DawnestOfBread.UltralightNet.Binaries" Version="$(UltralightVersion)"/>
+		<PackageReference Include="DawnestOfBread.UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)"/>
 
 		<PackageReference Include="coverlet.collector" Version="3.0.3">
 			<PrivateAssets>all</PrivateAssets>

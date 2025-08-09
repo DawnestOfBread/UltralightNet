@@ -3,12 +3,10 @@
 		<PackageId>DawnestOfBread.UltralightNet.Binaries</PackageId>
 		<Version>$(UltralightVersion)</Version>
 
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Platform>x64</Platform>
 
 		<Authors>Ultralight, Inc.</Authors>
 		<Copyright>Ultralight, Inc.</Copyright>
-		<PackageId>UltralightNet.Binaries</PackageId>
 		<Description>Ultralight binaries</Description>
 
 
@@ -16,6 +14,7 @@
 
 		<PackageLicenseExpression></PackageLicenseExpression>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>

@@ -51,6 +51,8 @@
 /.nuget
 /_ReSharper.Caches/
 /packages/
+Intermediate/
+Build/
 [Bb]uild[Ll]og.*
 [Tt]est[Rr]esult*/
 bin/

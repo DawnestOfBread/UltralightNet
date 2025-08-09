@@ -12,7 +12,8 @@ public unsafe struct UlBuffer : IDisposable, IEquatable<UlBuffer> // TODO: INati
 	public static UlBuffer CreateFromOwnedData(void* data, nuint length,
 		delegate* unmanaged[Cdecl]<void*, void*, void> destroyCallback = null, void* userData = null)
 	{
-		return data is null
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalse
+		return data is null && destroyCallback is not null
 			? throw new ArgumentException("Callback will not be called, if data is null", nameof(data))
 			: ulCreateBuffer(data, length, userData, destroyCallback);
 

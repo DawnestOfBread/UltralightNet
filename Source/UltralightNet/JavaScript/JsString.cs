@@ -86,6 +86,8 @@ public sealed unsafe class JsString : JsNativeContainer<JsStringRef>, IEquatable
 	{
 	}
 
+	public static implicit operator JsStringRef(JsString @string) => @string.JsHandle;
+
 	public nuint Length
 	{
 		get

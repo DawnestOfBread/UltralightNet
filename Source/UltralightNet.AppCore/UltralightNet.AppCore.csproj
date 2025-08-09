@@ -2,37 +2,15 @@
 
 	<PropertyGroup>
 		<PackageId>DawnestOfBread.UltralightNet.AppCore</PackageId>
-		<TargetFrameworks>net8.0;</TargetFrameworks>
-
-		<PackageId>UltralightNet.AppCore</PackageId>
 		<Description>AppCore bindings</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
 		<!-- <PackageLicenseFile>LICENSE.txt</PackageLicenseFile> -->
 	</PropertyGroup>
 	<ItemGroup>
-		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net8.0'"/>
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" PrivateAssets="All"/>
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj"/>
-		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)"/>
+		<PackageReference Include="DawnestOfBread.UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)"/>
 	</ItemGroup>
-
-	<Target Name="CopyLibraryImports" AfterTargets="Compile">
-		<PropertyGroup>
-			<GeneratedFilePath>$(MSBuildProjectDirectory)/obj/$(Configuration)/net8.0/generated/Microsoft.Interop.LibraryImportGenerator/Microsoft.Interop.LibraryImportGenerator/LibraryImports.g.cs</GeneratedFilePath>
-			<DestinationDir>$(MSBuildProjectDirectory)/LibraryImportGenerator/</DestinationDir>
-			<DestinationPath>$(DestinationDir)/LibraryImports.g.cs</DestinationPath>
-		</PropertyGroup>
-
-		<MakeDir Directories="$(DestinationDir)" Condition="!Exists('$(DestinationDir)')" />
-
-		<Copy SourceFiles="$(GeneratedFilePath)"
-			  DestinationFiles="$(DestinationPath)"
-			  Condition="Exists('$(GeneratedFilePath)')" />
-
-		<Warning Text="LibraryImports.g.cs not found at $(GeneratedFilePath)"
-				 Condition="!Exists('$(GeneratedFilePath)')" />
-	</Target>
 
 </Project>

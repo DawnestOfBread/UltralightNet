@@ -8,8 +8,8 @@ public struct UlCommand : IEquatable<UlCommand>
 
 	public CommandType CommandType
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, CommandType>(_commandType);
-		set => _commandType = UltralightNet.Methods.BitCast<CommandType, byte>(value);
+		readonly get => Methods.BitCast<byte, CommandType>(_commandType);
+		set => _commandType = Methods.BitCast<CommandType, byte>(value);
 	}
 
 	public UlGpuState GpuState;

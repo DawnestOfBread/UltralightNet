@@ -10,7 +10,7 @@ public unsafe ref struct UlVertexBuffer
 
 	public VertexBufferFormat Format
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, VertexBufferFormat>(_format);
-		set => _format = UltralightNet.Methods.BitCast<VertexBufferFormat, byte>(value);
+		readonly get => Methods.BitCast<byte, VertexBufferFormat>(_format);
+		set => _format = Methods.BitCast<VertexBufferFormat, byte>(value);
 	}
 }

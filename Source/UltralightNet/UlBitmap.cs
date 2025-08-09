@@ -6,7 +6,7 @@ using UltralightNet.Enums;
 namespace UltralightNet;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static unsafe partial class Methods
+public static unsafe partial class Methods
 {
 	/// <summary>Create empty bitmap.</summary>
 	[LibraryImport(LibUltralight)]

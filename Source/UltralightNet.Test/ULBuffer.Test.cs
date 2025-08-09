@@ -111,7 +111,7 @@ public unsafe class UlBufferTests
 		Assert.Throws<ArgumentException>(() =>
 			UlBuffer.CreateFromOwnedData(null, 0, (delegate* unmanaged[Cdecl]<void*, void*, void>)1));
 
-		using var buffer = UlBuffer.CreateFromOwnedData(ReadOnlySpan<byte>.Empty);
+		var buffer = UlBuffer.CreateFromOwnedData(new ReadOnlySpan<byte>());
 		Assert.False(buffer.IsDisposed);
 		buffer.Dispose();
 		Assert.True(buffer.IsDisposed);

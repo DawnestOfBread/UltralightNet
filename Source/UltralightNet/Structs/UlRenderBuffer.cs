@@ -10,15 +10,15 @@ public struct UlRenderBuffer
 
 	public bool HasStencilBuffer
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, bool>(_hasStencilBuffer);
-		set => _hasStencilBuffer = UltralightNet.Methods.BitCast<bool, byte>(value);
+		readonly get => Methods.BitCast<byte, bool>(_hasStencilBuffer);
+		set => _hasStencilBuffer = Methods.BitCast<bool, byte>(value);
 	}
 
 	private byte _hasDepthBuffer;
 
 	public bool HasDepthBuffer
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, bool>(_hasDepthBuffer);
-		set => _hasDepthBuffer = UltralightNet.Methods.BitCast<bool, byte>(value);
+		readonly get => Methods.BitCast<byte, bool>(_hasDepthBuffer);
+		set => _hasDepthBuffer = Methods.BitCast<bool, byte>(value);
 	}
 }

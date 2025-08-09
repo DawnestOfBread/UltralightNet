@@ -8,7 +8,7 @@ using System.Text;
 namespace UltralightNet;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static unsafe partial class Methods
+public static unsafe partial class Methods
 {
 	/// <summary>Create string from null-terminated ASCII C-string.</summary>
 	[LibraryImport(LibUltralight)]
@@ -83,6 +83,8 @@ public unsafe struct UlString : IDisposable, ICloneable, IEquatable<UlString>
 	public UlString(ReadOnlySpan<char> chars)
 	{
 		data = (byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(chars)) + 1);
+		var written = (nuint)Encoding.UTF8.GetBytes(chars, new Span<byte>(data, checked((int)length)));
+		Debug.Assert(written == length);
 		data[length] = 0;
 	}
 
@@ -110,7 +112,10 @@ public unsafe struct UlString : IDisposable, ICloneable, IEquatable<UlString>
 	public void Assign(ReadOnlySpan<char> newStr)
 	{
 		data = (byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(newStr)) + 1);
+		var written = (nuint)Encoding.UTF8.GetBytes(newStr, new Span<byte>(data, checked((int)length)));
+		Debug.Assert(written == length);
 		data[length] = 0;
+
 	}
 
 	public void Assign(ReadOnlySpan<byte> newStr)
@@ -165,7 +170,7 @@ public unsafe struct UlString : IDisposable, ICloneable, IEquatable<UlString>
 			length = length
 		};
 
-		Buffer.MemoryCopy(data, clone.data, clone.length, length);
+		Buffer.MemoryCopy(data, clone.data, length, length);
 
 		clone.data[length] = 0;
 
@@ -195,7 +200,6 @@ public unsafe struct UlString : IDisposable, ICloneable, IEquatable<UlString>
 		return other is UlString str && Equals(str);
 	}
 
-	#if NET6_0_OR_GREATER
 	public readonly override int GetHashCode()
 	{
 		var hash = new HashCode();
@@ -203,7 +207,6 @@ public unsafe struct UlString : IDisposable, ICloneable, IEquatable<UlString>
 		hash.AddBytes(new ReadOnlySpan<byte>(data, unchecked((int)Math.Clamp(length, 0, int.MaxValue))));
 		return hash.ToHashCode();
 	}
-	#endif
 
 	public static explicit operator string(UlString str) => str.data is null || str.length is 0
 		? string.Empty

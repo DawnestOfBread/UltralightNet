@@ -1,18 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<PackageId>DawnestOfBread.UltralightNet.AppCore.Binaries</PackageId>
 		<Version>$(UltralightVersion)</Version>
 
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Platform>x64</Platform>
 
 		<Authors>Ultralight, Inc.</Authors>
 		<Copyright>Ultralight, Inc.</Copyright>
-		<PackageId>UltralightNet.AppCore.Binaries</PackageId>
 		<Description>AppCore binaries</Description>
 
 		<!-- <PackageLicenseFile>LICENSE.txt</PackageLicenseFile> -->
 		<PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- <None Include="LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/> -->
@@ -20,7 +20,7 @@
 		<!-- <None Include="NOTICES.txt" Pack="true" PackagePath="NOTICES.txt"/> -->
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
+		<PackageReference Include="DawnestOfBread.UltralightNet.Binaries" Version="$(UltralightVersion)" />
 
 		<_NativeAssetName Include="runtimes/win-x64/native/AppCore.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libAppCore.dylib" PackagePath="runtimes/osx-x64/native" />

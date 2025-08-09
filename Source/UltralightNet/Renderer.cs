@@ -9,7 +9,7 @@ using UltralightNet.Structs;
 namespace UltralightNet;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static unsafe partial class Methods
+public static unsafe partial class Methods
 {
 	[LibraryImport(LibUltralight)]
 	internal static partial void* ulCreateRenderer(in UlConfig config);
@@ -25,6 +25,9 @@ internal static unsafe partial class Methods
 	/// <summary>Render all active Views.</summary>
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulRender(Renderer renderer);
+
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulRefreshDisplay(Renderer renderer, uint displayId);
 
 	/// <summary>Attempt to release as much memory as possible. Don't call this from any callbacks or driver code.</summary>
 	[LibraryImport(LibUltralight)]
@@ -85,19 +88,19 @@ public sealed unsafe class Renderer : NativeContainer
 
 	internal void AssertNotWrongThread() // hungry
 	{
-		if (ThreadId is not -1 && UlPlatform.ErrorWrongThread &&
+		if (ThreadId is not -1 && Platform.Platform.ErrorWrongThread &&
 		    ThreadId != Environment.CurrentManagedThreadId)
-			throw new AggregateException("Wrong thread. (UlPlatform.ErrorWrongThread)");
+			throw new AggregateException("Wrong thread. (Platform.ErrorWrongThread)");
 	}
 
-	public View CreateView(uint width, uint height, UlViewConfig? viewConfig = null, Session? session = null,
+	public View CreateView(uint width, uint height, ViewConfig? viewConfig = null, Session? session = null,
 		bool dispose = true)
 	{
-		viewConfig ??= new UlViewConfig();
-		if (Owns && UlPlatform.ErrorGPUDriverNotSet && viewConfig.Value.IsAccelerated &&
+		viewConfig ??= new ViewConfig();
+		if (Owns && Platform.Platform.ErrorGpuDriverNotSet && viewConfig.Value.IsAccelerated &&
 		    (GpuDriverWrapper?.IsDisposed).GetValueOrDefault(true))
 			throw new Exception(
-				"No UlPlatform.GPUDriver set, but UlViewConfig.IsAccelerated was set to true. (Disable check by setting UlPlatform.ErrorGPUDriverNotSet to false.)");
+				"No Platform.GPUDriver set, but ViewConfig.IsAccelerated was set to true. (Disable check by setting Platform.ErrorGPUDriverNotSet to false.)");
 		var view = View.FromHandle(
 			Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
 		view.Renderer = this;
@@ -134,6 +137,12 @@ public sealed unsafe class Renderer : NativeContainer
 	public void Render()
 	{
 		Methods.ulRender(this);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void RefreshDisplay(uint displayId)
+	{
+		Methods.ulRefreshDisplay(this, displayId);
 	}
 
 	public void PurgeMemory()

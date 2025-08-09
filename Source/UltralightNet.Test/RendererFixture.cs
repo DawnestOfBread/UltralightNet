@@ -15,7 +15,7 @@ public sealed class RendererFixture : IDisposable
 		//AppCoreMethods.ulEnablePlatformFileSystem(path);
 		//AppCoreMethods.ulEnableDefaultLogger(Path.Combine(path, "./ullog.txt"));
 
-		Renderer = UlPlatform.CreateRenderer();
+		Renderer = Platform.Platform.CreateRenderer();
 	}
 
 	public Renderer Renderer { get; }

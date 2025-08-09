@@ -25,7 +25,7 @@ public static unsafe partial class AppCoreMethods
 	public static void SetPlatformFontLoader()
 	{
 		ulEnablePlatformFontLoader();
-		UlPlatform.SetDefaultFontLoader = false;
+		Platform.Platform.SetDefaultFontLoader = false;
 	}
 
 	#region ulEnablePlatformFileSystem
@@ -38,8 +38,8 @@ public static unsafe partial class AppCoreMethods
 	{
 		ulEnablePlatformFileSystemActual(baseDirectory);
 
-		UlPlatform.SetDefaultFileSystem = false;
-		UlPlatform.ErrorMissingResources = false;
+		Platform.Platform.SetDefaultFileSystem = false;
+		Platform.Platform.ErrorMissingResources = false;
 	}
 
 	public static void ulEnablePlatformFileSystem(string baseDirectory)
@@ -71,7 +71,7 @@ public static unsafe partial class AppCoreMethods
 	{
 		ulEnableDefaultLoggerActual(logPath);
 
-		UlPlatform.EnableDefaultLogger = false;
+		Platform.Platform.EnableDefaultLogger = false;
 	}
 
 	public static void ulEnableDefaultLogger(string logPath)

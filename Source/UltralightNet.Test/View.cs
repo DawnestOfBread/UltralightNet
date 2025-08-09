@@ -61,14 +61,14 @@ public sealed class ViewTest
 	}
 
 	[Fact]
-	public void HTML()
+	public void Html()
 	{
 		using var view = Renderer.CreateView(512, 512);
-		view.Html = "<html />";
+		view.LoadHtml("<html />");
 	}
 
 	[Fact]
-	public void JSTest()
+	public void JsTest()
 	{
 		using var view = Renderer.CreateView(2, 2);
 		Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
@@ -85,21 +85,26 @@ public sealed class ViewTest
 	public void EventTest()
 	{
 		using var view = Renderer.CreateView(256, 256);
-		using var keyEvent = UlKeyEvent.Create(KeyEventType.Char, KeyEventModifiers.ShiftKey, 0, 0, "A", "A", false,
+		using var keyEvent = KeyEvent.Create(KeyEventType.Char, KeyEventModifiers.ShiftKey, 0, 0, "A", "A", false,
 			false, false);
 		view.FireKeyEvent(keyEvent);
-		view.FireMouseEvent(new UlMouseEvent
+		view.FireMouseEvent(new MouseEvent
 			{ Type = MouseEventType.MouseDown, X = 100, Y = 100, Button = MouseEventButton.Left });
-		view.FireScrollEvent(new UlScrollEvent { Type = ScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
+		view.FireScrollEvent(new ScrollEvent { Type = ScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
 	}
 
 	[Fact]
 	public void InspectorView()
 	{
 		using var view = Renderer.CreateView(256, 256);
-		view.OnCreateInspectorView = (isLocal, inspectedUrl) => throw new NotImplementedException(); // TODO
 
-		var inspectorView = view.CreateLocalInspectorView();
-		Assert.NotNull(inspectorView);
+		view.CreateLocalInspectorView();
+		view.OnCreateInspectorView = (isLocal, inspectedUrl) =>
+		{
+			var inspectorView = Renderer.CreateView(256, 256);
+			inspectorView.Url = inspectedUrl;
+			Assert.NotNull(inspectorView);
+			return inspectorView;
+		};
 	}
 }

@@ -11,8 +11,8 @@ public struct RenderTarget : IEquatable<RenderTarget>
 	/// <summary>Whether this target is empty (null texture)</summary>
 	public bool IsEmpty
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, bool>(_isEmpty);
-		set => _isEmpty = UltralightNet.Methods.BitCast<bool, byte>(value);
+		readonly get => Methods.BitCast<byte, bool>(_isEmpty);
+		set => _isEmpty = Methods.BitCast<bool, byte>(value);
 	}
 
 	/// <summary>The viewport width (in device coordinates).</summary>
@@ -21,7 +21,7 @@ public struct RenderTarget : IEquatable<RenderTarget>
 	/// <summary>The viewport height (in device coordinates).</summary>
 	public uint Height;
 
-	/// <summary><see cref="UlGpuDriver" />'s texture id</summary>
+	/// <summary><see cref="GpuDriver" />'s texture id</summary>
 	public uint TextureId;
 
 	/// <summary>The texture width (in pixels). This may be padded.</summary>
@@ -35,14 +35,14 @@ public struct RenderTarget : IEquatable<RenderTarget>
 	/// <summary>The pixel format of the texture.</summary>
 	public BitmapFormat TextureFormat
 	{
-		readonly get => UltralightNet.Methods.BitCast<byte, BitmapFormat>(_textureFormat);
-		set => _textureFormat = UltralightNet.Methods.BitCast<BitmapFormat, byte>(value);
+		readonly get => Methods.BitCast<byte, BitmapFormat>(_textureFormat);
+		set => _textureFormat = Methods.BitCast<BitmapFormat, byte>(value);
 	}
 
 	/// <summary>UV coordinates of the texture (this is needed because the texture may be padded).</summary>
 	public UlRect Uv;
 
-	/// <summary><see cref="UlGpuDriver" />'s render buffer id</summary>
+	/// <summary><see cref="GpuDriver" />'s render buffer id</summary>
 	public uint RenderBufferId;
 
 	public readonly bool Equals(RenderTarget rt)

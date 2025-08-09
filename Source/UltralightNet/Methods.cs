@@ -15,7 +15,7 @@ namespace UltralightNet;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 [SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-internal static unsafe partial class Methods
+public static unsafe partial class Methods
 {
 	public const string LibUltralight = "Ultralight";
 

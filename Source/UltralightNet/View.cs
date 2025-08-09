@@ -5,17 +5,17 @@ using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.Callbacks;
 using UltralightNet.Enums;
 using UltralightNet.JavaScript;
+using UltralightNet.Platform;
 using UltralightNet.Platform.HighPerformance;
 using UltralightNet.Structs;
 
 namespace UltralightNet;
 
-
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static unsafe partial class Methods
+public static unsafe partial class Methods
 {
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulCreateView(Renderer renderer, uint width, uint height, in UlViewConfig viewConfig,
+	public static partial void* ulCreateView(Renderer renderer, uint width, uint height, in ViewConfig viewConfig,
 		Session session);
 
 	[LibraryImport(LibUltralight)]
@@ -34,6 +34,12 @@ internal static unsafe partial class Methods
 
 	[LibraryImport(LibUltralight)]
 	public static partial uint ulViewGetHeight(View view);
+
+	[LibraryImport(LibUltralight)]
+	public static partial uint ulViewGetDisplayId(View view);
+
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewSetDisplayId(View view, uint displayId);
 
 	[LibraryImport(LibUltralight)]
 	public static partial double ulViewGetDeviceScale(View view);
@@ -68,7 +74,6 @@ internal static unsafe partial class Methods
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewResize(View view, uint width, uint height);
 
-	//todo: JavaScriptCore bindings
 	[LibraryImport(LibUltralight)]
 	public static partial JsContextRef ulViewLockJSContext(View view);
 
@@ -141,13 +146,13 @@ internal static unsafe partial class Methods
 	public static partial bool ulViewHasInputFocus(View view);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewFireKeyEvent(View view, UlKeyEvent keyEvent);
+	public static partial void ulViewFireKeyEvent(View view, KeyEvent keyEvent);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewFireMouseEvent(View view, UlMouseEvent* mouseEvent);
+	public static partial void ulViewFireMouseEvent(View view, MouseEvent* mouseEvent);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewFireScrollEvent(View view, UlScrollEvent* scrollEvent);
+	public static partial void ulViewFireScrollEvent(View view, ScrollEvent* scrollEvent);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetChangeTitleCallback(View view,
@@ -240,14 +245,106 @@ internal static unsafe partial class Methods
 	public static partial bool ulViewGetNeedsPaint(View view);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulViewCreateLocalInspectorView(View view);
+	public static partial void ulViewCreateLocalInspectorView(View view);
 }
 
+/// <summary>
+///     Web-page container rendered to an offscreen surface.
+///     The View class is responsible for loading and rendering web-pages to an offscreen surface. It
+///     is completely isolated from the OS windowing system, you must forward all input events to it
+///     from your application.
+///     <br /><br />
+///     Creating a View
+///     <br />
+///     You can create a View using <see cref="Renderer.CreateView"> Renderer::CreateView</see>.
+///     <code>
+///   // Create a ViewConfig with the desired settings
+///   var viewConfig = new ViewConfig();
+///
+///   // Create a View, 500 by 500 pixels in size, using the default Session
+///   var view = renderer.CreateView(500, 500, viewConfig, null);
+///  </code>
+///     <br />
+///     Loading Content into a View
+///     <br />
+///     You can load content asynchronously into a View by setting <see cref="View.Url">View.Url</see>.
+///     <code>
+///   // Load a URL into the View
+///   view.LoadURL("https://en.wikipedia.org/wiki/Main_Page");
+///  </code>
+///     Local File URLs
+///     <br />
+///     Local file URLs (eg, <c>file:///page.html</c>) will be loaded via FileSystem. You can provide your
+///     own FileSystem implementation so these files can be loaded from your application's resources.
+/// </summary>
+/// <br />
+/// <br />
+/// Displaying Views in Your Application
+/// <br />
+/// Views are rendered either to a pixel-buffer (View::surface) or a GPU texture
+/// (View::render_target) depending on whether CPU or GPU rendering is used (see
+/// ViewConfig::is_accelerated).
+/// <br />
+/// You can use the Surface or RenderTarget to display the View in your application.
+/// <code>
+///   // Get the Surface for the View (assuming CPU rendering)
+///   var surface = view.Surface;
+///
+///   // Check if the Surface is dirty (pixels have changed)
+///   if (!surface.DirtyBounds.IsEmpty) {
+///      // Get the underlying Bitmap.
+///      var bitmap = surface.Bitmap;
+///
+///      // Use the bitmap pixels here...
+///
+///      // Clear the dirty bounds after you're done displaying the pixels
+///      surface.ClearDirtyBounds();
+///   }
+///  </code>
+/// <br />
+/// Input Events
+/// <br />
+/// You must forward all input events to the View from your application. This includes keyboard,
+/// mouse, and scroll events.
+/// <code>
+///   // Forward a mouse-move event to the View
+///   var evt = new MouseEvent();
+///   evt.Type = MouseEventType.MouseMoved;
+///   evt.X = 100;
+///   evt.Y = 100;
+///   evt.Button = MouseEventButton.None;
+///   view.FireMouseEvent(evt);
+///  </code>
+/// <note>
+///     When using App::Create, the library will automatically create a View for you when you
+///     call Overlay::Create.
+///     <br /><br />
+///     The View API is not thread-safe, all calls must be made on the same thread that the
+///     Renderer or App was created on.
+/// </note>
 [NativeMarshalling(typeof(Marshaller))]
 [SuppressMessage("ReSharper", "UnassignedField.Global")]
 public sealed unsafe class View : NativeContainer
 {
+	/// <summary>
+	/// Set callback for when the page wants to create a new View.
+	///
+	/// This is usually the result of a user clicking a link with target="_blank" or by JavaScript
+	/// calling window.open(url).
+	///
+	/// To allow creation of these new Views, you should create a new View in this callback, resize it
+	/// to your container, and return it. You are responsible for displaying the returned View.
+	///
+	/// You should return NULL if you want to block the action.
+	/// </summary>
 	public CreateChildViewCallback? OnCreateChildView;
+
+	/// <summary>
+	/// Set callback for when the page wants to create a new View to display the local inspector in.
+	///
+	/// You should create a new View in this callback, resize it to your
+	/// container, and return it. You are responsible for displaying the returned View.
+	/// </summary>
 	public CreateInspectorViewCallback? OnCreateInspectorView;
 
 	protected override void* Handle
@@ -261,159 +358,375 @@ public sealed unsafe class View : NativeContainer
 
 	internal Renderer? Renderer { get; set; }
 
+	/// <summary>
+	/// Get and set the URL of the View.
+	/// </summary>
 	public string Url
 	{
 		get => Methods.ulViewGetURL(this);
 		set => Methods.ulViewLoadURL(this, value);
 	}
 
-	public string Html
-	{
-		set => Methods.ulViewLoadHTML(this, value);
-	}
+	/// <summary>
+	/// Load a raw string of HTML, the View will navigate to it as a new page.
+	/// </summary>
+	/// <param name="html">The raw HTML string to load.</param>
+	public void LoadHtml(string html) => Methods.ulViewLoadHTML(this, html);
 
+	/// <summary>
+	/// Get the title of the current page loaded into this View, if any.
+	/// </summary>
 	public string Title => Methods.ulViewGetTitle(this);
 
+	/// <summary>
+	/// Get the width of the View, in pixels.
+	/// </summary>
 	public uint Width => Methods.ulViewGetWidth(this);
+
+	/// <summary>
+	///  Get the height of the View, in pixels.
+	/// </summary>
 	public uint Height => Methods.ulViewGetHeight(this);
 
+	/// <summary>
+	/// Get or set the device scale, i.e. the amount to scale page units to screen pixels.
+	///
+	/// For example, a value of 1.0 is equivalent to 100% zoom. A value of 2.0 is 200% zoom.
+	/// </summary>
 	public double DeviceScale
 	{
 		get => Methods.ulViewGetDeviceScale(this);
 		set => Methods.ulViewSetDeviceScale(this, value);
 	}
 
+	/// <summary>
+	/// Get or set the display id of the View.
+	/// </summary>
+	/// <seealso cref="ViewConfig.DisplayId">ViewConfig.DisplayId</seealso>
+	public uint DisplayId
+	{
+		get => Methods.ulViewGetDisplayId(this);
+		set => Methods.ulViewSetDisplayId(this, value);
+	}
+
+	/// <summary>
+	/// Whether the View is GPU-accelerated. If this is false, the page will be rendered
+	/// via the CPU renderer.
+	/// </summary>
 	public bool IsAccelerated => Methods.ulViewIsAccelerated(this);
+
+	/// <summary>
+	/// Whether the View supports transparent backgrounds.
+	/// </summary>
 	public bool IsTransparent => Methods.ulViewIsTransparent(this);
 
+	/// <summary>
+	/// Check if the main frame of the page is currently loading.
+	/// </summary>
 	public bool IsLoading => Methods.ulViewIsLoading(this);
 
 	/// <summary>
-	///     Provides info used to display texture in your application
+	///     Get the RenderTarget for the View.
 	/// </summary>
-	/// <remarks>Only valid when <see cref="UlGpuDriver" /> is used</remarks>
+	/// <remarks>Only valid if this View is using the GPU renderer (see <see cref="ViewConfig.IsAccelerated"/>).</remarks>
+	/// <note>
+	/// You can use this with your <see cref="GpuDriver"/> implementation to bind and display the
+	/// corresponding texture in your application.
+	/// </note>
 	public RenderTarget RenderTarget
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		get => Methods.ulViewGetRenderTarget(this);
 	}
 
-	public UlSurface? Surface
+	/// <summary>
+	/// Get the Surface for the View (native pixel buffer that the CPU renderer draws into).
+	/// </summary>
+	/// <remarks>
+	/// This operation is only valid if the View is using the CPU renderer, (eg, it is
+	/// <b>not</b> GPU accelerated, see <see cref="ViewConfig.IsAccelerated"/>). This function will
+	/// return null if the View is using the GPU renderer.
+	/// </remarks>
+	/// <note>
+	/// The default Surface is BitmapSurface, but you can provide your own Surface
+	/// implementation via <see cref="Platform.SetSurfaceFactory"/> Platform::set_surface_factory().
+	/// </note>
+	public Surface? Surface
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		get
 		{
-			var surfaceHandle = Methods.ulViewGetSurface(this);
+			UIntPtr surfaceHandle = Methods.ulViewGetSurface(this);
 			if (surfaceHandle is 0) return null;
-			return UlSurface.FromHandle(surfaceHandle);
+			return UltralightNet.Surface.FromHandle(surfaceHandle);
 		}
 	}
 
+	/// <summary>
+	/// Whether we can navigate backwards in history
+	/// </summary>
 	public bool CanGoBack => Methods.ulViewCanGoBack(this);
+
+	/// <summary>
+	/// Whether we can navigate forwards in history
+	/// </summary>
 	public bool CanGoForward => Methods.ulViewCanGoForward(this);
 
+	/// <summary>
+	/// Whether the View has focus.
+	/// </summary>
 	public bool HasFocus => Methods.ulViewHasFocus(this);
+
+	/// <summary>
+	/// Whether the View has an input element with visible keyboard focus (indicated by a
+	/// blinking caret).
+	///
+	/// You can use this to decide whether the View should consume keyboard input events
+	/// (useful in games with mixed UI and key handling).
+	/// </summary>
 	public bool HasInputFocus => Methods.ulViewHasInputFocus(this);
 
+	/// <summary>
+	/// Get or set whether this View should be repainted during the next call to Renderer::Render
+	/// </summary>
+	/// <note>
+	/// This flag is automatically set whenever the page content changes, but you can set it
+	/// directly in case you need to force a repaint.
+	/// </note>
 	public bool NeedsPaint
 	{
 		get => Methods.ulViewGetNeedsPaint(this);
 		set => Methods.ulViewSetNeedsPaint(this, value);
 	}
 
+	/// <summary>
+	/// Resize View to a certain size.
+	/// </summary>
+	/// <param name="width">The initial width, in pixels.</param>
+	/// <param name="height">The initial height, in pixels.</param>
 	public void Resize(in uint width, in uint height)
 	{
 		Methods.ulViewResize(this, width, height);
 	}
 
+	/// <summary>
+	/// Acquire the page's JSContext for use with the JavaScriptCore API
+	/// </summary>
+	/// <returns>The view's JSContext</returns>
+	/// <note>
+	/// You can use the underlying JSContextRef with the JavaScriptCore C API. This allows you
+	/// to marshall C/C++ objects to/from JavaScript, bind callbacks, and call JS functions
+	/// directly.
+	/// <br/><br/>
+	/// The JSContextRef gets reset after each page navigation. You should initialize your
+	/// JavaScript state within the OnWindowObjectReady and OnDomReady events.
+	/// <br/><br/>
+	/// This call locks the internal context for the current thread. It will be unlocked when
+	/// the returned JSContext's ref-count goes to zero. The lock is recursive, you can call
+	/// this multiple times.
+	/// </note>
 	public JsContextRef LockJsContext()
 	{
 		return Methods.ulViewLockJSContext(this);
 	}
 
+	/// <summary>
+	/// Unlock the JsContext
+	/// </summary>
 	public void UnlockJsContext()
 	{
 		Methods.ulViewUnlockJSContext(this);
 	}
 
+	/// <summary>
+	/// Helper function to evaluate a raw string of JavaScript and return the result as a String.
+	/// </summary>
+	/// <param name="jsString">A string of JavaScript to evaluate in the main frame.</param>
+	/// <param name="exception">A string to store the exception in, if any. Pass null if you don't care about exceptions.</param>
+	/// <returns>Returns the JavaScript result typecast to a String.</returns>
+	/// <note>
+	/// You do not need to lock the JS context, it is done automatically.
+	/// <br/>
+	/// If you need lower-level access to native JavaScript values, you should instead lock
+	/// the JS context and call <see cref="JsBase.EvaluateScript"/> in the JavaScriptCore API.
+	/// </note>
 	public string EvaluateScript(string jsString, out string exception)
 	{
 		return Methods.ulViewEvaluateScript(this, jsString, out exception);
 	}
 
+	/// <summary>
+	/// Navigate backwards in history
+	/// </summary>
 	public void GoBack()
 	{
 		Methods.ulViewGoBack(this);
 	}
 
+	/// <summary>
+	/// Navigate forwards in history
+	/// </summary>
 	public void GoForward()
 	{
 		Methods.ulViewGoForward(this);
 	}
 
+	/// <summary>
+	/// Navigate to an arbitrary offset in history
+	/// </summary>
+	/// <param name="offset"></param>
 	public void GoToHistoryOffset(in int offset)
 	{
 		Methods.ulViewGoToHistoryOffset(this, offset);
 	}
 
+	/// <summary>
+	/// Reload current page
+	/// </summary>
 	public void Reload()
 	{
 		Methods.ulViewReload(this);
 	}
 
+	/// <summary>
+	///  Stop all page loads
+	/// </summary>
 	public void Stop()
 	{
 		Methods.ulViewStop(this);
 	}
 
+	/// <summary>
+	/// Give focus to the View.
+	///
+	/// You should call this to give visual indication that the View has input focus (changes active
+	/// text selection colors, for example).
+	/// </summary>
 	public void Focus()
 	{
 		Methods.ulViewFocus(this);
 	}
 
+	/// <summary>
+	/// Remove focus from the View and unfocus any focused input elements.
+	///
+	/// You should call this to give visual indication that the View has lost input focus.
+	/// </summary>
 	public void Unfocus()
 	{
 		Methods.ulViewUnfocus(this);
 	}
 
-	public void FireKeyEvent(UlKeyEvent keyEvent)
+	/// <summary>
+	/// Fire a keyboard event.
+	/// </summary>
+	/// <param name="keyEvent"></param>
+	public void FireKeyEvent(KeyEvent keyEvent)
 	{
 		Methods.ulViewFireKeyEvent(this, keyEvent);
 	}
 
-	public void FireMouseEvent(UlMouseEvent mouseEvent)
+	/// <summary>
+	/// Fire a mouse event.
+	/// </summary>
+	/// <param name="mouseEvent"></param>
+	public void FireMouseEvent(MouseEvent mouseEvent)
 	{
 		Methods.ulViewFireMouseEvent(this, &mouseEvent);
 	}
 
-	public void FireScrollEvent(UlScrollEvent scrollEvent)
+	/// <summary>
+	/// Fire a scroll event.
+	/// </summary>
+	/// <param name="scrollEvent"></param>
+	public void FireScrollEvent(ScrollEvent scrollEvent)
 	{
 		Methods.ulViewFireScrollEvent(this, &scrollEvent);
 	}
 
-	public View CreateLocalInspectorView()
-	{
-		var handle = Methods.ulViewCreateLocalInspectorView(this);
-		var view = FromHandle(handle, false);
-		view.Renderer = Renderer;
-		return view;
-	}
+	/// <summary>
+	/// Create an Inspector View to inspect / debug this View locally.
+	///
+	/// This will only succeed if you have the inspector assets in your filesystem-- the inspector
+	/// will look for file:///inspector/Main.html when it first loads.
+	///
+	/// You must handle ViewListener::OnCreateInspectorView so that the library has a View to display
+	/// the inspector in. This function will call this event only if an inspector view is not
+	/// currently active.
+	/// </summary>
+	public void CreateLocalInspectorView() => Methods.ulViewCreateLocalInspectorView(this);
 
+	/// <summary>
+	/// Set callback for when the page title changes.
+	/// </summary>
 	public event Action<string>? OnChangeTitle;
+
+	/// <summary>
+	///  Set callback for when the page URL changes.
+	/// </summary>
 	public event Action<string>? OnChangeUrl;
+
+	/// <summary>
+	/// Set callback for when the tooltip changes (usually result of a mouse hover).
+	/// </summary>
 	public event Action<string>? OnChangeTooltip;
+
+	/// <summary>
+	/// Set callback for when the mouse cursor changes.
+	/// </summary>
 	public event Action<Cursor>? OnChangeCursor;
+
+	/// <summary>
+	/// Set callback for when a message is added to the console (useful for JavaScript / network errors
+	/// and debugging).
+	/// </summary>
 	public event AddConsoleMessageCallback? OnAddConsoleMessage;
+
+	/// <summary>
+	/// Set callback for when the page begins loading a new URL into a frame.
+	/// </summary>
 	public event BeginLoadingCallback? OnBeginLoading;
+
+	/// <summary>
+	/// Set callback for when the page finishes loading a URL into a frame.
+	/// </summary>
 	public event FinishLoadingCallback? OnFinishLoading;
+
+	/// <summary>
+	/// Set callback for when an error occurs while loading a URL into a frame.
+	/// </summary>
 	public event FailLoadingCallback? OnFailLoading;
+
+	/// <summary>
+	/// Set callback for when the JavaScript window object is reset for a new page load.
+	///
+	/// This is called before any scripts are executed on the page and is the earliest time to set up any
+	/// initial JavaScript state or bindings.
+	///
+	/// The document is not guaranteed to be loaded/parsed at this point. If you need to make any
+	/// JavaScript calls that are dependent on DOM elements or scripts on the page, use DOMReady
+	/// instead.
+	///
+	/// The window object is lazily initialized (this will not be called on pages with no scripts).
+	/// </summary>
 	public event WindowObjectReadyCallback? OnWindowObjectReady;
+
+	/// <summary>
+	/// Set callback for when all JavaScript has been parsed and the document is ready.
+	///
+	/// This is the best time to make any JavaScript calls that are dependent on DOM elements or scripts
+	/// on the page.
+	/// </summary>
 	public event DomReadyCallback? OnDomReady;
+
+	/// <summary>
+	/// Set callback for when the history (back/forward state) is modified.
+	/// </summary>
 	public event Action? OnUpdateHistory;
 
 	internal void SetUpCallbacks()
 	{
-		var data = Renderer!.GetCallbackData();
+		UIntPtr data = Renderer!.GetCallbackData();
 		Methods.ulViewSetChangeTitleCallback(this, &NativeOnChangeTitle, data);
 		Methods.ulViewSetChangeURLCallback(this, &NativeOnChangeURL, data);
 		Methods.ulViewSetChangeTooltipCallback(this, &NativeOnChangeTooltip, data);

@@ -1,6 +1,8 @@
 <Project>
 	<PropertyGroup>
-		<UltralightVersion>1.3.0</UltralightVersion>
+		<UltralightVersion>1.4.0</UltralightVersion>
+
+		<TargetFramework>net8.0</TargetFramework>
 
 		<GenVersion>$([System.DateTime]::UtcNow.ToString("yyyy.MM.dd.HHmm"))</GenVersion>
 		<AssemblyVersion>$(GenVersion)</AssemblyVersion>
@@ -45,8 +47,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" Condition="$(Configuration)==Release"/>
-
 		<None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="README.md" Condition="$(Configuration)==Release"/>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" Condition="$(Configuration)==Release"/>
 	</ItemGroup>
+
+	<!--  Directories  -->
+	<PropertyGroup>
+		<NativeLibDirectory>$(MSBuildThisFileDirectory)native/</NativeLibDirectory>
+		<BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)Intermediate\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+		<IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+		<MSBUildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBUildProjectExtensionsPath>
+
+		<BuildPath>$(MSBuildThisFileDirectory)Build</BuildPath>
+		<BaseOutputPath>$(BuildPath)\$(Configuration)</BaseOutputPath>
+		<OutputPath>$(BaseOutputPath)\bin\</OutputPath>
+
+		<PackageOutputPath>$(BaseOutputPath)\nuget\</PackageOutputPath>
+	</PropertyGroup>
 </Project>

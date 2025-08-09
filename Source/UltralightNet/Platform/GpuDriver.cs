@@ -10,7 +10,7 @@ namespace UltralightNet.Platform
 		/// <summary>
 		///     <see cref="IGpuDriver" /> native definition.
 		/// </summary>
-		public unsafe struct UlGpuDriver
+		public unsafe struct GpuDriver
 		{
 			#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<void> BeginSynchronize;
@@ -65,7 +65,7 @@ namespace UltralightNet.Platform
 		void UpdateCommandList(UlCommandList commandList);
 
 		#if !NETSTANDARD2_0
-		virtual UlGpuDriver? GetNativeStruct()
+		virtual GpuDriver? GetNativeStruct()
 		{
 			return null;
 		}
@@ -75,7 +75,7 @@ namespace UltralightNet.Platform
 
 		internal sealed unsafe class Wrapper : IDisposable
 		{
-			private readonly UlGpuDriver _nativeStruct;
+			private readonly GpuDriver _nativeStruct;
 
 			private readonly Dictionary<nint, WeakReference<UlBitmap>>? _bitmapCache;
 
@@ -155,7 +155,7 @@ namespace UltralightNet.Platform
 				};
 			}
 
-			public UlGpuDriver NativeStruct
+			public GpuDriver NativeStruct
 			{
 				get
 				{
@@ -223,6 +223,7 @@ namespace UltralightNet.Platform
 		void BeginSynchronize();
 
 		/// <summary>Called after any commands are dispatched during a frame.</summary>
+
 		void EndSynchronize();
 	}
 }

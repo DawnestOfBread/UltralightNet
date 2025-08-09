@@ -11,110 +11,110 @@ public static class JsValue
 	/// <summary>
 	/// Get the value's <see cref="JsType">type</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The provided value's <see cref="JsType">type</see></returns>
-	public static JsType GetType(JsContextRef context, JsValueRef jsValue) =>
+	public static JsType GetType(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueGetType(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is undefined
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsUndefined(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsUndefined(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsUndefined(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is null
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsNull(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsNull(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsNull(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is a boolean
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsBoolean(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsBoolean(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsBoolean(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is a number
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsNumber(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsNumber(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsNumber(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is string
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsString(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsString(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsString(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is a symbol
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsSymbol(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsSymbol(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsSymbol(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is an <see cref="JsObjectRef">object</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsObject(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsObject(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsObject(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is undefined
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsArray(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsArray(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsArray(context, jsValue);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is an object of the specified <see cref="JsClassRef">class</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <param name="jsClass">a js class</param>
 	/// <returns>A boolean</returns>
-	public static bool IsObjectOfClass(JsContextRef context, JsValueRef jsValue, JsClassRef jsClass) =>
+	public static bool IsObjectOfClass(this JsValueRef jsValue, JsContextRef context, JsClassRef jsClass) =>
 		JavaScriptMethods.JSValueIsObjectOfClass(context, jsValue, jsClass);
 
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is undefined
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>A boolean</returns>
-	public static bool IsDate(JsContextRef context, JsValueRef jsValue) =>
+	public static bool IsDate(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueIsDate(context, jsValue);
 
 	/// <summary>
 	/// Check the <see cref="JsTypedArrayType">array type</see> of the <see cref="JsValueRef">value</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>An <see cref="JsTypedArrayType">array type</see></returns>
-	public static unsafe JsTypedArrayType GetTypedArrayType(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe JsTypedArrayType GetTypedArrayType(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueGetTypedArrayType(context, jsValue);
 
 	/// <summary>
@@ -142,11 +142,11 @@ public static class JsValue
 	/// <summary>
 	/// Check whether the <see cref="JsValueRef">value</see> is an instance of a constructor
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to examine</param>
+	/// <param name="context">the js context to use</param>
 	/// <param name="constructor">the constructor to check against</param>
 	/// <returns>A boolean</returns>
-	public static unsafe bool IsInstanceOfConstructor(JsContextRef context, JsValueRef jsValue, JsObjectRef constructor) =>
+	public static unsafe bool IsInstanceOfConstructor(this JsValueRef jsValue, JsContextRef context, JsObjectRef constructor) =>
 		JavaScriptMethods.JSValueIsInstanceOfConstructor(context, jsValue, constructor);
 
 	/// <summary>
@@ -246,100 +246,100 @@ public static class JsValue
 	/// <summary>
 	/// Creates a boolean representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s boolean value</returns>
-	public static bool ToBoolean(JsContextRef context, JsValueRef jsValue) =>
+	public static bool ToBoolean(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueToBoolean(context, jsValue);
 
 	/// <summary>
 	/// Creates a double representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s double value</returns>
-	public static unsafe double ToDouble(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe double ToDouble(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates a float representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s float value</returns>
-	public static unsafe float ToFloat(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe float ToFloat(this JsValueRef jsValue, JsContextRef context) =>
 		(float)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates a short representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s short value</returns>
-	public static unsafe short ToInt16(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe short ToInt16(this JsValueRef jsValue, JsContextRef context) =>
 		(short)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates an ushort representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s ushort value</returns>
-	public static unsafe ushort ToUInt16(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe ushort ToUInt16(this JsValueRef jsValue, JsContextRef context) =>
 		(ushort)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates an int representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s int value</returns>
-	public static unsafe int ToInt32(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe int ToInt32(this JsValueRef jsValue, JsContextRef context) =>
 		(int)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates an uint representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s uint value</returns>
-	public static unsafe uint ToUInt32(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe uint ToUInt32(this JsValueRef jsValue, JsContextRef context) =>
 		(uint)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates a long representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s long value</returns>
-	public static unsafe long ToInt64(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe long ToInt64(this JsValueRef jsValue, JsContextRef context) =>
 		(long)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates an ulong representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s ulong value</returns>
-	public static unsafe ulong ToUInt64(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe ulong ToUInt64(this JsValueRef jsValue, JsContextRef context) =>
 		(ulong)JavaScriptMethods.JSValueToNumber(context, jsValue);
 
 	/// <summary>
 	/// Creates a copy of the <see cref="JsValueRef">value reference</see>'s string value
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s string value</returns>
-	public static unsafe JsStringRef ToStringCopy(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe JsStringRef ToStringCopy(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueToStringCopy(context, jsValue);
 
 	/// <summary>
 	/// Creates a copy of the <see cref="JsValueRef">value reference</see>'s string value
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s string value</returns>
-	public static unsafe string ToUtf16StringCopy(JsContextRef context, JsValueRef jsValue)
+	public static unsafe string ToUtf16StringCopy(this JsValueRef jsValue, JsContextRef context)
 	{
 		var jsString = JsString.FromHandle(JavaScriptMethods.JSValueToStringCopy(context, jsValue), true);
 		var str = jsString.ToString();
@@ -350,26 +350,26 @@ public static class JsValue
 	/// <summary>
 	/// Creates a JavaScript object representation of the <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to use</param>
+	/// <param name="context">the js context to use</param>
 	/// <returns>The <see cref="JsValueRef">value reference</see>'s ulong value</returns>
-	public static unsafe JsObjectRef ToObject(JsContextRef context, JsValueRef jsValue) =>
+	public static unsafe JsObjectRef ToObject(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueToObject(context, jsValue);
 
 	/// <summary>
 	/// Protects a <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to protect</param>
-	public static void Protect(JsContextRef context, JsValueRef jsValue) =>
+	/// <param name="context">the js context to use</param>
+	public static void Protect(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueProtect(context, jsValue);
 
 	/// <summary>
 	/// Unprotects a <see cref="JsValueRef">value reference</see>
 	/// </summary>
-	/// <param name="context">the js context to use</param>
 	/// <param name="jsValue">the value ref to unprotect</param>
-	public static void Unprotect(JsContextRef context, JsValueRef jsValue) =>
+	/// <param name="context">the js context to use</param>
+	public static void Unprotect(this JsValueRef jsValue, JsContextRef context) =>
 		JavaScriptMethods.JSValueUnprotect(context, jsValue);
 }
 

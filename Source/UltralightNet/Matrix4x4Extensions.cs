@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace UltralightNet;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static partial class Methods
+public static partial class Methods
 {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	[LibraryImport(LibUltralight)]

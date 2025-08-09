@@ -33,7 +33,7 @@ public sealed unsafe class JsBasic(RendererFixture fixture)
 		nuint argumentCount, JsValueRef* arguments, JsValueRef* exception)
 	{
 		{
-			var thisObjectName = JsValue.ToStringCopy(ctx, thisObject);
+			var thisObjectName = JsValue.ToStringCopy(thisObject, ctx);
 			using var wrappedThisObjectName = JsString.FromHandle(thisObjectName, true);
 			Assert.Equal("[object Window]", wrappedThisObjectName.ToString());
 		}
