@@ -44,11 +44,14 @@
 		<LangVersion>12</LangVersion>
 
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="README.md" Condition="$(Configuration)==Release"/>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" Condition="$(Configuration)==Release"/>
+		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="." />
 	</ItemGroup>
 
 	<!--  Directories  -->

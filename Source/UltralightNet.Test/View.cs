@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Threading;
 using UltralightNet.Enums;
 using UltralightNet.Structs;
+using Xunit.Abstractions;
 
 namespace UltralightNet.Test;
 
@@ -9,8 +10,11 @@ namespace UltralightNet.Test;
 [Trait("Category", "Renderer")]
 public sealed class ViewTest
 {
-	public ViewTest(RendererFixture fixture)
+	private readonly ITestOutputHelper _testOutputHelper;
+
+	public ViewTest(RendererFixture fixture, ITestOutputHelper testOutputHelper)
 	{
+		_testOutputHelper = testOutputHelper;
 		Renderer = fixture.Renderer;
 	}
 
@@ -98,13 +102,14 @@ public sealed class ViewTest
 	{
 		using var view = Renderer.CreateView(256, 256);
 
-		view.CreateLocalInspectorView();
 		view.OnCreateInspectorView = (isLocal, inspectedUrl) =>
 		{
+			_testOutputHelper.WriteLine($"OnCreateInspectorView: {isLocal}, {inspectedUrl}");
 			var inspectorView = Renderer.CreateView(256, 256);
 			inspectorView.Url = inspectedUrl;
 			Assert.NotNull(inspectorView);
 			return inspectorView;
 		};
+		view.CreateLocalInspectorView();
 	}
 }

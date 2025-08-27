@@ -105,49 +105,20 @@ public struct UlConfig : IEquatable<UlConfig>
 	/// </remarks>
 	public uint BitmapAlignment = 16;
 
+	/// <summary>
+	/// The quality of effects (blurs, CSS filters, SVG filters, etc.) to use when rendering.
+	/// </summary>
+	public EffectQuality EffectQuality = EffectQuality.Medium;
+
 	public UlConfig()
 	{
 	}
 
 	public readonly override bool Equals([NotNullWhen(true)] object? obj)
 	{
-		return obj is UlConfig ? Equals((UlConfig)obj) : false;
+		return obj is UlConfig config && Equals(config);
 	}
 
-	public readonly bool Equals(UlConfig other)
-	{
-		return CachePath == other.CachePath &&
-		       ResourcePathPrefix == other.ResourcePathPrefix &&
-		       FaceWinding == other.FaceWinding &&
-		       FontHinting == other.FontHinting &&
-		       Math.Abs(FontGamma - other.FontGamma) < double.Epsilon &&
-		       UserStylesheet == other.UserStylesheet &&
-		       ForceRepaint == other.ForceRepaint &&
-		       Math.Abs(AnimationTimerDelay - other.AnimationTimerDelay) < double.Epsilon &&
-		       Math.Abs(ScrollTimerDelay - other.ScrollTimerDelay) < double.Epsilon &&
-		       Math.Abs(RecycleDelay - other.RecycleDelay) < double.Epsilon &&
-		       MemoryCacheSize == other.MemoryCacheSize &&
-		       PageCacheSize == other.PageCacheSize &&
-		       OverrideRamSize == other.OverrideRamSize &&
-		       MinLargeHeapSize == other.MinLargeHeapSize &&
-		       MinSmallHeapSize == other.MinSmallHeapSize &&
-		       NumRendererThreads == other.NumRendererThreads &&
-		       Math.Abs(MaxUpdateTime - other.MaxUpdateTime) < double.Epsilon &&
-		       BitmapAlignment == other.BitmapAlignment;
-	}
-	#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
-	public readonly override int GetHashCode()
-	{
-		return HashCode.Combine(
-			HashCode.Combine(CachePath, ResourcePathPrefix, FaceWinding, FontHinting, FontGamma, UserStylesheet,
-				ForceRepaint, AnimationTimerDelay),
-			HashCode.Combine(ScrollTimerDelay, RecycleDelay, MemoryCacheSize, PageCacheSize, OverrideRamSize,
-				MinLargeHeapSize, MinSmallHeapSize, NumRendererThreads),
-			HashCode.Combine(MaxUpdateTime, BitmapAlignment));
-	}
-	#else
-	public readonly override int GetHashCode() => base.GetHashCode();
-	#endif
 	public static bool operator ==(UlConfig left, UlConfig right)
 	{
 		return left.Equals(right);
@@ -188,6 +159,7 @@ public struct UlConfig : IEquatable<UlConfig>
 		public double MaxUpdateTime;
 
 		public uint BitmapAlignment;
+		public byte EffectQuality;
 
 		public void FromManaged(UlConfig config)
 		{
@@ -209,6 +181,7 @@ public struct UlConfig : IEquatable<UlConfig>
 			NumRendererThreads = config.NumRendererThreads;
 			MaxUpdateTime = config.MaxUpdateTime;
 			BitmapAlignment = config.BitmapAlignment;
+			EffectQuality = Methods.BitCast<EffectQuality, byte>(config.EffectQuality);
 		}
 
 		public readonly Marshaller ToUnmanaged()
@@ -222,5 +195,35 @@ public struct UlConfig : IEquatable<UlConfig>
 			ResourcePathPrefix.Dispose();
 			UserStylesheet.Dispose();
 		}
+	}
+
+	public bool Equals(UlConfig other)
+	{
+		return CachePath == other.CachePath && ResourcePathPrefix == other.ResourcePathPrefix && FaceWinding == other.FaceWinding && FontHinting == other.FontHinting && FontGamma.Equals(other.FontGamma) && UserStylesheet == other.UserStylesheet && ForceRepaint == other.ForceRepaint && AnimationTimerDelay.Equals(other.AnimationTimerDelay) && ScrollTimerDelay.Equals(other.ScrollTimerDelay) && RecycleDelay.Equals(other.RecycleDelay) && MemoryCacheSize == other.MemoryCacheSize && PageCacheSize == other.PageCacheSize && OverrideRamSize == other.OverrideRamSize && MinLargeHeapSize == other.MinLargeHeapSize && MinSmallHeapSize == other.MinSmallHeapSize && NumRendererThreads == other.NumRendererThreads && MaxUpdateTime.Equals(other.MaxUpdateTime) && BitmapAlignment == other.BitmapAlignment && EffectQuality == other.EffectQuality;
+	}
+
+	public override int GetHashCode()
+	{
+		var hashCode = new HashCode();
+		hashCode.Add(CachePath);
+		hashCode.Add(ResourcePathPrefix);
+		hashCode.Add((int)FaceWinding);
+		hashCode.Add((int)FontHinting);
+		hashCode.Add(FontGamma);
+		hashCode.Add(UserStylesheet);
+		hashCode.Add(ForceRepaint);
+		hashCode.Add(AnimationTimerDelay);
+		hashCode.Add(ScrollTimerDelay);
+		hashCode.Add(RecycleDelay);
+		hashCode.Add(MemoryCacheSize);
+		hashCode.Add(PageCacheSize);
+		hashCode.Add(OverrideRamSize);
+		hashCode.Add(MinLargeHeapSize);
+		hashCode.Add(MinSmallHeapSize);
+		hashCode.Add(NumRendererThreads);
+		hashCode.Add(MaxUpdateTime);
+		hashCode.Add(BitmapAlignment);
+		hashCode.Add((int)EffectQuality);
+		return hashCode.ToHashCode();
 	}
 }

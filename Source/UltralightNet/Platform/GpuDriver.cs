@@ -46,32 +46,184 @@ namespace UltralightNet.Platform
 		}
 	}
 
+	/// <summary>
+	/// User-defined GPU driver interface.
+	/// <br/>
+	/// The library uses this to optionally render Views on the GPU (see <see cref="ViewConfig.IsAccelerated"/>).
+	/// <br/>
+	/// You can provide the library with your own GPU driver implementation so that all rendering is
+	/// performed using an existing GPU context (useful for game engines).
+	/// <br/>
+	/// When a View is rendered on the GPU, you can retrieve the backing texture ID via
+	/// View::render_target().
+	/// <br/><br/>
+	/// Default Implementation
+	/// <br/>
+	/// A platform-specific implementation of GPUDriver is provided for you when you call App::Create(),
+	/// (currently D3D11, Metal, and OpenGL). We recommend using these classes as a starting point for
+	/// your own implementation (available open-source in the AppCore repository on GitHub).
+	/// <br/><br/>
+	/// Setting the GPU Driver
+	/// <br/>
+	/// When using Renderer::Create(), you can provide your own implementation of this
+	/// class via Platform::set_gpu_driver().
+	/// <br/><br/>
+	/// State Synchronization
+	/// <br/>
+	/// During each call to Renderer::Render(), the library will update the state of the GPU driver
+	/// (textures, render buffers, geometry, command lists, etc.) to match the current state of the
+	/// library.
+	/// <br/><br/>
+	/// Detecting State Changes
+	/// <br/>
+	/// The library will call BeginSynchronize() before any state is updated and EndSynchronize() after
+	/// all state is updated. All `Create` / `Update` / `Destroy` calls will be made between these two
+	/// calls.
+	/// <br/>
+	/// This allows the GPU driver implementation to prepare the GPU for any state changes.
+	/// <br/><br/>
+	/// Drawing
+	/// <br/>
+	/// All drawing is done via command lists (UpdateCommandList()) to allow asynchronous execution
+	/// of commands on the GPU.
+	/// <br/>
+	/// The library will dispatch a list of commands to the GPU driver during state synchronization. The
+	/// GPU driver implementation should periodically consume the command list and execute the commands
+	/// at an appropriate time.
+	/// </summary>
+	/// <seealso cref="Platform.GpuDriver"/>
 	public interface IGpuDriver
 	{
+		/// <summary>
+		/// Get the next available texture ID.
+		///
+		/// This is used to generate a unique texture ID for each texture created by the library. The
+		/// GPU driver implementation is responsible for mapping these IDs to a native ID.
+		/// </summary>
+		/// <note>
+		/// Numbering should start at 1, 0 is reserved for "no texture".
+		/// </note>
+		/// <returns>The next available texture ID.</returns>
 		uint NextTextureId();
+
+		/// <summary>
+		/// Create a texture with a certain ID and optional bitmap.
+		/// </summary>
+		/// <param name="textureId">The texture ID to use for the new texture.</param>
+		/// <param name="bitmap">The bitmap to initialize the texture with (can be empty).</param>
+		/// <note>
+		/// If the Bitmap is empty (Bitmap::IsEmpty), then an RTT Texture should be created instead.
+		/// This will be used as a backing texture for a new RenderBuffer.
+		/// </note>
+		/// <warning>
+		/// A deep copy of the bitmap data should be made if you are uploading it to the GPU
+		/// asynchronously, it will not persist beyond this call.
+		/// </warning>
 		void CreateTexture(uint textureId, UlBitmap bitmap);
+
+		/// <summary>
+		/// Update an existing non-RTT texture with new bitmap data.
+		/// </summary>
+		/// <param name="textureId">The texture to update.</param>
+		/// <param name="bitmap">The new bitmap data.</param>
+		/// <warning>
+		/// A deep copy of the bitmap data should be made if you are uploading it to the GPU
+		/// asynchronously, it will not persist beyond this call.
+		/// </warning>
 		void UpdateTexture(uint textureId, UlBitmap bitmap);
+
+		/// <summary>
+		/// Destroy a texture.
+		/// </summary>
+		/// <param name="textureId">The texture to destroy.</param>
 		void DestroyTexture(uint textureId);
 
+		/// <summary>
+		/// Get the next available render buffer ID.
+		/// <br/>
+		/// This is used to generate a unique render buffer ID for each render buffer created by the
+		/// library. The GPU driver implementation is responsible for mapping these IDs to a native ID.
+		/// </summary>
+		/// <note>
+		/// Numbering should start at 1, 0 is reserved for "no render buffer".
+		/// </note>
+		/// <returns>Returns the next available render buffer ID.</returns>
 		uint NextRenderBufferId();
+
+		/// <summary>
+		/// Create a render buffer with certain ID and buffer description.
+		/// </summary>
+		/// <param name="renderBufferId">The render buffer ID to use for the new render buffer.</param>
+		/// <param name="renderBuffer">The render buffer description.</param>
 		void CreateRenderBuffer(uint renderBufferId, UlRenderBuffer renderBuffer);
+
+		/// <summary>
+		/// Destroy a render buffer.
+		/// </summary>
+		/// <param name="renderBufferId">The render buffer to destroy.</param>
 		void DestroyRenderBuffer(uint renderBufferId);
 
+		/// <summary>
+		/// Get the next available geometry ID.
+		///
+		/// This is used to generate a unique geometry ID for each geometry created by the library. The
+		/// GPU driver implementation is responsible for mapping these IDs to a native ID.
+		/// </summary>
+		/// <note>
+		/// Numbering should start at 1, 0 is reserved for "no geometry".
+		/// </note>
+		/// <returns>
+		/// Returns the next available geometry ID.
+		/// </returns>
 		uint NextGeometryId();
+
+		/// <summary>
+		/// Create geometry with certain ID and vertex/index data.
+		/// </summary>
+		/// <param name="geometryId">The geometry ID to use for the new geometry.</param>
+		/// <param name="vertexBuffer">The vertex buffer data.</param>
+		/// <param name="indexBuffer">The index buffer data.</param>
+		/// <warning>
+		/// A deep copy of the bitmap data should be made if you are uploading it to the GPU
+		/// asynchronously, it will not persist beyond this call.
+		/// </warning>
 		void CreateGeometry(uint geometryId, UlVertexBuffer vertexBuffer, UlIndexBuffer indexBuffer);
+
+		/// <summary>
+		/// Update existing geometry with new vertex/index data.
+		/// </summary>
+		/// <param name="geometryId">The geometry to update.</param>
+		/// <param name="vertexBuffer">The new vertex buffer data.</param>
+		/// <param name="indexBuffer">The new index buffer data.</param>
+		/// <warning>
+		/// A deep copy of the bitmap data should be made if you are uploading it to the GPU
+		/// asynchronously, it will not persist beyond this call.
+		/// </warning>
 		void UpdateGeometry(uint geometryId, UlVertexBuffer vertexBuffer, UlIndexBuffer indexBuffer);
+
+		/// <summary>
+		/// Destroy geometry.
+		/// </summary>
+		/// <param name="geometryId">The geometry to destroy.</param>
 		void DestroyGeometry(uint geometryId);
 
+		/// <summary>
+		/// Update the pending command list with commands to execute on the GPU.
+		///
+		/// Commands are dispatched to the GPU driver asynchronously via this method. The GPU driver
+		/// implementation should consume these commands and execute them at an appropriate time.
+		/// </summary>
+		/// <param name="commandList">The list of commands to execute.</param>
+		/// <warning>
+		/// Implementations should make a deep copy of the command list, it will not persist
+		/// beyond this call.
+		/// </warning>
 		void UpdateCommandList(UlCommandList commandList);
 
-		#if !NETSTANDARD2_0
-		virtual GpuDriver? GetNativeStruct()
+		GpuDriver? GetNativeStruct()
 		{
 			return null;
 		}
-		#else
-		ULGPUDriver? GetNativeStruct();
-		#endif
 
 		internal sealed unsafe class Wrapper : IDisposable
 		{
@@ -217,13 +369,20 @@ namespace UltralightNet.Platform
 		}
 	}
 
+	/// <inheritdoc cref="IGpuDriver"/>
 	public interface IGpuDriverSynchronized : IGpuDriver
 	{
-		/// <summary>Called before any commands are dispatched during a frame.</summary>
+		/// <summary>
+		/// Called before any state (eg, CreateTexture(), UpdateTexture(), DestroyTexture(), etc.) is
+		/// updated during a call to Renderer::Render().
+		///
+		/// This is a good time to prepare the GPU for any state updates.
+		/// </summary>
 		void BeginSynchronize();
 
-		/// <summary>Called after any commands are dispatched during a frame.</summary>
-
+		/// <summary>
+		/// Called after all state has been updated during a call to Renderer::Render().
+		/// </summary>
 		void EndSynchronize();
 	}
 }

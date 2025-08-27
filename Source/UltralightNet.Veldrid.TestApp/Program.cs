@@ -32,7 +32,7 @@ namespace UltralightNet.Veldrid.TestApp
 
 		private static readonly UlConfig config = new()
 		{
-			ForceRepaint = false,
+			ForceRepaint = true,
 			CachePath = "./cache/",
 			BitmapAlignment = 1, // improves performance (veldrid only)
 			FaceWinding = FaceWinding.CounterClockwise
@@ -57,7 +57,7 @@ namespace UltralightNet.Veldrid.TestApp
 			{
 				if(OperatingSystem.IsWindowsVersionAtLeast(8, 1))
 					Windows.SetProcessDpiAwareness(PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
-				else if(OperatingSystem.IsWindowsVersionAtLeast(6))
+				else if(OperatingSystem.IsWindowsVersionAtLeast(6, 1))
 					Windows.SetProcessDPIAware();
 				else return false;
 				return true;
@@ -210,10 +210,16 @@ void main()
 
 			var renderer = Platform.Platform.CreateRenderer(config);
 			var view = renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig, renderer.CreateSession(true, "Cookies_please"));
+			view.OnCreateInspectorView += (local, inspectorUrl) =>
+			{
+				Console.WriteLine($"OnCreateInspectorView: {local}, {inspectorUrl}");
+				return renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig);
+			};
+			view.CreateLocalInspectorView();
 
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
-			const string url = "https://en.key-test.ru/";//*/"https://github.com/SupinePandora43";
+			const string url = "https://github.com/DawnestOfBread";//*/"https://github.com/SupinePandora43";
 
 			view.Url = url;
 

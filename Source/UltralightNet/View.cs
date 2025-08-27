@@ -185,10 +185,6 @@ public static unsafe partial class Methods
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetCreateInspectorViewCallback(View view,
-		delegate* unmanaged[Cdecl]<nuint, void*, bool, UlString*, void*> callback, nuint id);
-
-	[LibraryImport(LibUltralight)]
-	internal static partial void ulViewSetCreateInspectorViewCallback(View view,
 		delegate* unmanaged[Cdecl]<nuint, void*, byte, UlString*, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
@@ -340,11 +336,15 @@ public sealed unsafe class View : NativeContainer
 	public CreateChildViewCallback? OnCreateChildView;
 
 	/// <summary>
-	/// Set callback for when the page wants to create a new View to display the local inspector in.
+	/// Called when the page wants to create a new View to display the local inspector in.
 	///
-	/// You should create a new View in this callback, resize it to your
+	/// You should create a new View in this callback (eg, Renderer::CreateView()), resize it to your
 	/// container, and return it. You are responsible for displaying the returned View.
 	/// </summary>
+	/// <returns>
+	/// Returns a View to use to satisfy the request (or return
+	///          null if you want to block the action).
+	/// </returns>
 	public CreateInspectorViewCallback? OnCreateInspectorView;
 
 	protected override void* Handle
@@ -515,7 +515,7 @@ public sealed unsafe class View : NativeContainer
 	/// <returns>The view's JSContext</returns>
 	/// <note>
 	/// You can use the underlying JSContextRef with the JavaScriptCore C API. This allows you
-	/// to marshall C/C++ objects to/from JavaScript, bind callbacks, and call JS functions
+	/// to marshall C# objects to/from JavaScript, bind callbacks, and call JS functions
 	/// directly.
 	/// <br/><br/>
 	/// The JSContextRef gets reset after each page navigation. You should initialize your
@@ -790,12 +790,9 @@ public sealed unsafe class View : NativeContainer
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	private static void* NativeOnCreateInspectorView(nuint userData, void* caller, byte isLocal, UlString* inspectedUrl)
 	{
-		#if DEBUG
-		throw new NotImplementedException("NativeOnCreateChildView");
-		#else
+		throw new Exception($"NativeOnCreateInspectorView: userData={userData}, caller={(nuint)caller}, isLocal={isLocal}, urlPtr={inspectedUrl->ToString()}");
 		var view = GetView(userData, caller).OnCreateInspectorView?.Invoke(isLocal != 0, inspectedUrl->ToString());
 		return view is null ? null : view.Handle;
-		#endif
 	}
 
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
